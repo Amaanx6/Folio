@@ -7,7 +7,7 @@ on:
     paths:
       - "apps/calling/**"
       - "packages/typescript-config/**"
-      - "railway.toml"
+      - "apps/calling/railway.json"
       - ".dockerignore"
   workflow_dispatch: # Allows manual trigger from GitHub UI
 

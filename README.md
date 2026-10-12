@@ -91,7 +91,16 @@ The backend uses Neon’s WebSocket pool driver because worker, provisioning, qu
 
 ## Deployment and validation
 
-The repository includes a Railway configuration at `railway.toml` that builds `apps/calling/Dockerfile` and checks `/health`. Configure provider credentials and the public service URL as Railway environment variables; local `.env` values are not deployed automatically.
+The repository-root `railway.toml` builds `apps/backend/Dockerfile` and checks `/health`. From the repository root, link the CLI to the Railway project and backend service, then deploy with:
+
+```sh
+railway link
+railway up --service <backend-service-name>
+```
+
+Configure the backend service's environment variables in Railway; local `.env` values are not deployed automatically. Set `DATABASE_URL`, Firebase Admin credentials (`FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, and `FIREBASE_PRIVATE_KEY`), `CALLING_SERVICE_URL`, `WEBHOOK_SECRET`, and `BACKEND_WORKER_SECRET`. Set `ALLOWED_ORIGINS` to the deployed frontend origin(s), and make sure the calling service's `CALLBACK_URL` points to `https://<backend-host>/api/calls/complete`.
+
+The calling service has a separate config at `apps/calling/railway.json`. To keep its GitHub Actions deployment building the calling Dockerfile, set the calling Railway service's Config as Code path to `/apps/calling/railway.json` in Railway service settings. The backend service should use the root `railway.toml`.
 
 The live calling flow has been exercised in more than 10 calls with positive feedback, according to the project owner. This is useful real-world prototype validation, not a substitute for automated regression, load, security, or recovery testing. The web dashboard, database-backed call persistence, queue automation, and production operations still need work.
 
