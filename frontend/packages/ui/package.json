@@ -1,0 +1,25 @@
+{
+  "name": "@repo/ui",
+  "version": "0.0.0",
+  "private": true,
+  "sideEffects": false,
+  "exports": {
+    "./primitives/*": "./src/primitives/*.tsx",
+    "./composed/*": "./src/composed/*.tsx",
+    "./hooks/*": "./src/hooks/*.ts",
+    "./styles/*": "./src/styles/*.css"
+  },
+  "scripts": {
+    "lint": "eslint src/",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "react": "^18.3.0",
+    "react-dom": "^18.3.0"
+  },
+  "devDependencies": {
+    "@repo/config-typescript": "workspace:*",
+    "@repo/config-eslint": "workspace:*",
+    "typescript": "^5.5.0"
+  }
+}
