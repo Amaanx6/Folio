@@ -42,7 +42,7 @@ const Navbar = () => {
 
                     <button
                         type="button"
-                        className="flex h-[38px] shrink-0 items-center justify-center rounded-[2px] bg-black px-3 font-['Space_Grotesk'] text-[13px] font-medium leading-[18px] tracking-[0.13px] text-white transition-colors duration-200 hover:bg-[#8A8886] xl:px-4"
+                        className="flex h-9.5 shrink-0 items-center justify-center rounded-xs bg-black px-3 font-['Space_Grotesk'] text-[13px] font-medium leading-4.5 tracking-[0.13px] text-white transition-colors duration-200 hover:bg-[#8A8886] xl:px-4"
                     >
                         Start free trial
                     </button>
