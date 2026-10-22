@@ -3,4 +3,5 @@
 
 @theme inline {
   --font-sans: var(--font-space-grotesk);
+  --font-newsreader: var(--font-newsreader);
 }
