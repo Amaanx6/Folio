@@ -23,7 +23,6 @@ export const Hero_top_right = () => {
                 </div>
             </div>
 
-            {/* Client testimonial */}
             <p className="font-['Newsreader'] text-[13px] font-normal italic leading-[17.88px] text-[#444748]">
                 "We processed 1,840 prospective tenants without hiring an outsourced call center."
             </p>
