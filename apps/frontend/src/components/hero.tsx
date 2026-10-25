@@ -58,7 +58,7 @@ export const Hero = () => {
                 {/* Subtitle */}
                 <p className="mt-6 max-w-[580px] font-['Space_Grotesk'] text-[15px] font-normal leading-[24px] tracking-[0.1px] text-[#747878] md:text-[16px]">
                     Run voice calls with the reliability of software, not the variability of
-                    people. Folio combines an AI-powered dialer with a deterministic voice agent
+                    people. Foolioo combines an AI-powered dialer with a deterministic voice agent
                     to give your team full control over every conversation.
                 </p>
 

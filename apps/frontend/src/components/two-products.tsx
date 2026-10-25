@@ -22,7 +22,7 @@ export const TwoProducts = () => {
                         </span>
                     </h2>
                     <p className="mt-4 max-w-[540px] font-['Space_Grotesk'] text-[14px] font-normal leading-[22px] tracking-[0.1px] text-[#747878] md:text-[15px]">
-                        Folio blends high-volume campaign orchestration with deterministic voice agent workflows into a single reliable platform.
+                        Foolioo blends high-volume campaign orchestration with deterministic voice agent workflows into a single reliable platform.
                     </p>
                 </div>
 
@@ -189,7 +189,7 @@ export const TwoProducts = () => {
                                     </div>
                                     <div className="rounded-lg rounded-tl-none border border-[#E9E8E1] bg-[#F5F3EC] p-3.5 shadow-2xs">
                                         <p className="font-['Space_Grotesk'] text-[13px] leading-[20px] text-[#1B1C18]">
-                                            &ldquo;Hello Laura, thank you for taking the time to speak with Folio. I&apos;m following up on your team&apos;s inquiry regarding our automated outbound dialer and deterministic voice agent. Is now still a good time for a quick 3-minute discussion?&rdquo;
+                                            &ldquo;Hello Laura, thank you for taking the time to speak with Foolioo. I&apos;m following up on your team&apos;s inquiry regarding our automated outbound dialer and deterministic voice agent. Is now still a good time for a quick 3-minute discussion?&rdquo;
                                         </p>
                                     </div>
                                 </div>
@@ -213,7 +213,7 @@ export const TwoProducts = () => {
                                     </div>
                                     <div className="rounded-lg rounded-tl-none border border-[#DDD6FE] bg-[#F5F3FF] p-3.5 shadow-2xs">
                                         <p className="font-['Space_Grotesk'] text-[13px] leading-[20px] text-[#4338CA]">
-                                            &ldquo;That&apos;s exactly what we specialize in. Folio can qualify those 1,800 prospective tenants in under two hours with strict adherence to your compliance script and zero hallucinations. Would you like me to trigger an automated demo run to your phone right now?&rdquo;
+                                            &ldquo;That&apos;s exactly what we specialize in. Foolioo can qualify those 1,800 prospective tenants in under two hours with strict adherence to your compliance script and zero hallucinations. Would you like me to trigger an automated demo run to your phone right now?&rdquo;
                                         </p>
                                     </div>
                                 </div>

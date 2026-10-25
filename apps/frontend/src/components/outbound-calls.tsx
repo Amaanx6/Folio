@@ -13,7 +13,7 @@ export const OutboundCalls = () => {
 
                         <h2 className="mt-4">
                             <span className="block font-['Newsreader'] text-[36px] font-normal leading-[1.12] tracking-[-0.8px] text-[#1B1C18] sm:text-[44px]">
-                                Folio runs your outbound
+                                Foolioo runs your outbound
                             </span>
                             <span className="block font-['Newsreader'] text-[36px] font-normal leading-[1.12] tracking-[-0.8px] text-[#1B1C18] sm:text-[44px]">
                                 calls{" "}
@@ -22,7 +22,7 @@ export const OutboundCalls = () => {
                         </h2>
 
                         <p className="mt-5 font-['Space_Grotesk'] text-[15px] font-normal leading-[24px] tracking-[0.1px] text-[#747878]">
-                            Upload a list. Set the rules. Folio calls each contact with natural, context-aware conversation—handling objections, answering questions, and booking meetings without human intervention.
+                            Upload a list. Set the rules. Foolioo calls each contact with natural, context-aware conversation—handling objections, answering questions, and booking meetings without human intervention.
                         </p>
 
                         {/* Feature bullets */}
