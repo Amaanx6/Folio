@@ -1,12 +1,27 @@
-import { Hero } from "@/components/hero";
 import Navbar from "@/components/Navbar";
-import { Hero_top_right } from "@/components/utils/hero_top_right";
+import { Hero } from "@/components/hero";
+import { TwoProducts } from "@/components/two-products";
+import { TrustBar } from "@/components/trust-bar";
+import { OutboundCalls } from "@/components/outbound-calls";
+import { VoiceAgent } from "@/components/voice-agent";
+import { CallsIntoAnswers } from "@/components/calls-into-answers";
+import { Integrations } from "@/components/integrations";
+import { Pricing } from "@/components/pricing";
+import { CtaFooter } from "@/components/cta-footer";
 
 export default function Home() {
   return (
-    <div className="text-black">
+    <main className="min-h-screen bg-[#FBF9F2] text-[#1B1C18]">
       <Navbar />
       <Hero />
-    </div>
+      <TwoProducts />
+      <TrustBar />
+      <OutboundCalls />
+      <VoiceAgent />
+      <CallsIntoAnswers />
+      <Integrations />
+      <Pricing />
+      <CtaFooter />
+    </main>
   );
 }
