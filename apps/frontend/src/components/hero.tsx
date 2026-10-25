@@ -7,7 +7,7 @@ export const Hero = () => {
     return (
         <section className="relative mx-auto w-full max-w-7xl overflow-hidden px-6 pb-20 pt-10 md:px-10 md:pb-28 md:pt-16 lg:px-12">
             {/* Floooating cards for desktop view */}
-            <div className="pointer-events-none absolute left-6 top-16 hidden xl:block">
+            <div className="pointer-events-none absolute left-2 top-16 hidden xl:block">
                 <div className="pointer-events-auto">
                     <Hero_top_left />
                 </div>
@@ -33,13 +33,14 @@ export const Hero = () => {
 
             {/* Central hero content */}
             <div className="mx-auto flex max-w-210 flex-col items-center text-center">
-                {/* Beta tag */}
-                <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#F59E0B]/30 bg-[#FEF3C7]/60 px-3.5 py-1 text-center shadow-xs">
+                {/* Beta tag, UI needs to be recreated and should be used for future feature pre launcges */}
+                {/* <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-[#F59E0B]/30 bg-[#FEF3C7]/60 px-3.5 py-1 text-center shadow-xs">
                     <span className="text-[12px]">⚡️</span>
                     <span className="font-['Space_Grotesk'] text-[11px] font-semibold uppercase tracking-[0.5px] text-[#B45309]">
                         Now in Beta: Detect and prevent outbound call scams
                     </span>
-                </div>
+                </div> */}
+
 
                 {/* Main headline */}
                 <h1 className="tracking-tight">
