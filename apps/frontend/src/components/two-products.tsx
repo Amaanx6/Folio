@@ -115,7 +115,7 @@ export const TwoProducts = () => {
                                 </div>
                                 <div className="mt-2 flex items-baseline gap-2">
                                     <span className="font-['Space_Grotesk'] text-[32px] font-bold text-[#1B1C18]">
-                                        412 min
+                                        525 min
                                     </span>
                                     <span className="font-['Space_Grotesk'] text-[11px] text-[#747878]">
                                         (Avg: 3m 42s)
@@ -138,14 +138,14 @@ export const TwoProducts = () => {
                                 </div>
                                 <div className="mt-2 flex items-baseline gap-2">
                                     <span className="font-['Space_Grotesk'] text-[32px] font-bold text-[#1B1C18]">
-                                        ₹0.03
+                                        ₹0.07
                                     </span>
                                     <span className="font-['Space_Grotesk'] text-[11px] text-[#747878]">
                                         / minute
                                     </span>
                                 </div>
                                 <p className="mt-2 font-['Space_Grotesk'] text-[11px] text-[#747878]">
-                                    vs outsourced call center rep ($1.85/min)
+                                    vs outsourced call center rep (₹18/min)
                                 </p>
                             </div>
                         </div>
