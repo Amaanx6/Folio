@@ -2,12 +2,12 @@ export const Pricing = () => {
     const plans = [
         {
             name: "Starter",
-            price: "$149",
+            price: "₹149",
             period: "/month",
             description: "For small teams validating outbound & inbound AI voice operations.",
             features: [
                 "5 active deterministic agents",
-                "1,000 included minutes / month",
+                "1,400 included minutes / month",
                 "Finite state machine builder",
                 "Standard CRM sync (HubSpot, Salesforce)",
                 "Email support (24hr SLA)",
@@ -18,12 +18,12 @@ export const Pricing = () => {
         {
             name: "Professional",
             badge: "RECOMMENDED",
-            price: "$499",
+            price: "₹499",
             period: "/month",
             description: "For scaling revenue teams that require high-throughput voice operations.",
             features: [
                 "20 active deterministic agents",
-                "5,000 included minutes / month",
+                "7,000 included minutes / month",
                 "Advanced state machine & branching",
                 "Real-time automated QA grading",
                 "Custom webhooks & API access",
