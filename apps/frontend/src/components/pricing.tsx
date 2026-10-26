@@ -5,9 +5,12 @@ export const Pricing = () => {
             price: "₹149",
             period: "/month",
             description: "For small teams validating outbound & inbound AI voice operations.",
+            credits: "9,000 credits / month",
+            estimate: "~25 min of talk time",
             features: [
                 "5 active deterministic agents",
-                "1,400 included minutes / month",
+                "9,000 included credits / month",
+                "1 credit = 10 seconds of conversation",
                 "Finite state machine builder",
                 "Standard CRM sync (HubSpot, Salesforce)",
                 "Email support (24hr SLA)",
@@ -21,9 +24,12 @@ export const Pricing = () => {
             price: "₹499",
             period: "/month",
             description: "For scaling revenue teams that require high-throughput voice operations.",
+            credits: "45,000 credits / month",
+            estimate: "~125 min of talk time",
             features: [
                 "20 active deterministic agents",
-                "7,000 included minutes / month",
+                "45,000 included credits / month",
+                "1 credit = 10 seconds of conversation",
                 "Advanced state machine & branching",
                 "Real-time automated QA grading",
                 "Custom webhooks & API access",
@@ -37,9 +43,12 @@ export const Pricing = () => {
             price: "Custom",
             period: "billed annually",
             description: "For high-volume operations with custom security and carrier routing.",
+            credits: "Volume-tiered credits",
+            estimate: "Estimated talk time scales with usage",
             features: [
                 "Unlimited deterministic agents",
-                "Volume-tiered pricing (< $0.02/min)",
+                "Volume-tiered credit pricing",
+                "Credit rate adjusts with platform costs",
                 "Dedicated carrier trunking & BYO SIP",
                 "Dedicated account manager & SLA",
                 "SOC-2 Type II & HIPAA compliance",
@@ -65,7 +74,7 @@ export const Pricing = () => {
                         </span>
                     </h2>
                     <p className="mt-4 max-w-[540px] font-['Space_Grotesk'] text-[14px] font-normal leading-[22px] tracking-[0.1px] text-[#747878] md:text-[15px]">
-                        Fair and transparent pricing that scales with your team. No hidden platform surcharges or surprise overages.
+                        Fair and transparent pricing that scales with your team. You pay in credits — not fixed minutes — so talk time flexes with real usage. No hidden platform surcharges or surprise overages.
                     </p>
                 </div>
 
@@ -103,6 +112,15 @@ export const Pricing = () => {
                                         </span>
                                         <span className="font-['Space_Grotesk'] text-[13px] text-[#747878]">
                                             {plan.period}
+                                        </span>
+                                    </div>
+
+                                    <div className="mt-3 flex flex-col gap-1">
+                                        <span className="font-['Space_Grotesk'] text-[12px] font-semibold text-[#1B1C18]">
+                                            {plan.credits}
+                                        </span>
+                                        <span className="font-['Space_Grotesk'] text-[11px] text-[#747878]">
+                                            Estimated: {plan.estimate}
                                         </span>
                                     </div>
                                 </div>

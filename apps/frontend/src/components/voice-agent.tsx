@@ -52,7 +52,7 @@ export const VoiceAgent = () => {
                                         02. Budget & Move-in Qualification
                                     </span>
                                     <span className="rounded bg-[#E3FCEF] px-1.5 py-0.5 font-['Space_Grotesk'] text-[10px] font-semibold text-[#22A06B]">
-                                        Condition: Budget &ge; $3,500
+                                        Condition: Budget &ge; ₹3,500
                                     </span>
                                 </div>
                                 <p className="mt-2 font-['Space_Grotesk'] text-[12px] leading-[18px] text-[#747878]">
