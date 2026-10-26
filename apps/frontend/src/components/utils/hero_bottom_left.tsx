@@ -12,7 +12,7 @@ export const Hero_bottom_left = () => {
 
             <div className="mt-1 flex items-baseline gap-2">
                 <span className="font-['Space_Grotesk'] text-[24px] font-bold leading-tight text-[#1B1C18]">
-                    $4.20
+                    ₹4.20
                 </span>
                 <span className="font-['Space_Grotesk'] text-[11px] text-[#747878]">
                     / qualified lead

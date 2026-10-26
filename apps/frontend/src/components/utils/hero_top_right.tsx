@@ -14,7 +14,7 @@ export const Hero_top_right = () => {
 
                 <div className="flex min-w-0 flex-col">
                     <p className="font-['Space_Grotesk'] text-[12px] font-medium leading-3.75 text-[#1B1C18]">
-                        Laura Mercer
+                      Ananya Mehta  
                     </p>
 
                     <p className="whitespace-nowrap font-['Space_Grotesk'] text-[10px] font-normal leading-3.25 text-[#747878]">

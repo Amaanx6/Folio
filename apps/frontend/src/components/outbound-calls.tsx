@@ -91,11 +91,11 @@ export const OutboundCalls = () => {
                             <div className="flex items-center justify-between p-4 transition hover:bg-[#FAFAF8]">
                                 <div className="flex items-center gap-3">
                                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#E9E8E1] font-['Space_Grotesk'] text-[11px] font-bold text-[#1B1C18]">
-                                        DV
+                                        AK
                                     </div>
                                     <div>
                                         <p className="font-['Space_Grotesk'] text-[13px] font-semibold text-[#1B1C18]">
-                                            Devon Vance • (415) 892-0192
+                                            Arjun Kapoor • +91 98201 45019
                                         </p>
                                         <p className="font-['Space_Grotesk'] text-[11px] text-[#747878]">
                                             Acme Logistics • Duration: 02:14
@@ -122,11 +122,11 @@ export const OutboundCalls = () => {
                             <div className="flex items-center justify-between p-4 transition hover:bg-[#FAFAF8]">
                                 <div className="flex items-center gap-3">
                                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#E9E8E1] font-['Space_Grotesk'] text-[11px] font-bold text-[#1B1C18]">
-                                        MS
+                                        RM
                                     </div>
                                     <div>
                                         <p className="font-['Space_Grotesk'] text-[13px] font-semibold text-[#1B1C18]">
-                                            Marcus Sterling • (312) 440-1928
+                                            Rohan Mehta • +91 99300 27184
                                         </p>
                                         <p className="font-['Space_Grotesk'] text-[11px] text-[#747878]">
                                             Apex Healthcare • Ringing (12s)
@@ -143,11 +143,11 @@ export const OutboundCalls = () => {
                             <div className="flex items-center justify-between p-4 transition hover:bg-[#FAFAF8]">
                                 <div className="flex items-center gap-3">
                                     <div className="flex h-8 w-8 items-center justify-center rounded-full bg-[#E9E8E1] font-['Space_Grotesk'] text-[11px] font-bold text-[#1B1C18]">
-                                        ER
+                                        PS
                                     </div>
                                     <div>
                                         <p className="font-['Space_Grotesk'] text-[13px] font-semibold text-[#1B1C18]">
-                                            Elena Rostova • (212) 991-3844
+                                            Priya Sharma • +91 98450 61237
                                         </p>
                                         <p className="font-['Space_Grotesk'] text-[11px] text-[#747878]">
                                             Summit Media • Call completed

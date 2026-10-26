@@ -137,7 +137,7 @@ export const TwoProducts = () => {
                                 </div>
                                 <div className="mt-2 flex items-baseline gap-2">
                                     <span className="font-['Space_Grotesk'] text-[32px] font-bold text-[#1B1C18]">
-                                        $0.03
+                                        ₹0.03
                                     </span>
                                     <span className="font-['Space_Grotesk'] text-[11px] text-[#747878]">
                                         / minute
@@ -155,14 +155,14 @@ export const TwoProducts = () => {
                             <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#E9E8E1] pb-4">
                                 <div className="flex items-center gap-3">
                                     <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#E9E8E1] font-['Space_Grotesk'] text-[12px] font-bold text-[#1B1C18]">
-                                        LM
+                                        AM
                                     </div>
                                     <div>
                                         <p className="font-['Space_Grotesk'] text-[13px] font-semibold text-[#1B1C18]">
-                                            Laura Mercer • VP Operations, Guild Real Estate
+                                            Ananya Mehta • VP Operations, Guild Real Estate
                                         </p>
                                         <p className="font-['Space_Grotesk'] text-[11px] text-[#747878]">
-                                            +1 (415) 892-0192 • San Francisco, CA
+                                            +91 98200 45192 • Mumbai, MH
                                         </p>
                                     </div>
                                 </div>
@@ -189,7 +189,7 @@ export const TwoProducts = () => {
                                     </div>
                                     <div className="rounded-lg rounded-tl-none border border-[#E9E8E1] bg-[#F5F3EC] p-3.5 shadow-2xs">
                                         <p className="font-['Space_Grotesk'] text-[13px] leading-[20px] text-[#1B1C18]">
-                                            &ldquo;Hello Laura, thank you for taking the time to speak with Foolioo. I&apos;m following up on your team&apos;s inquiry regarding our automated outbound dialer and deterministic voice agent. Is now still a good time for a quick 3-minute discussion?&rdquo;
+                                            &ldquo;Hello Ananya, thank you for taking the time to speak with Foolioo. I&apos;m following up on your team&apos;s inquiry regarding our automated outbound dialer and deterministic voice agent. Is now still a good time for a quick 3-minute discussion?&rdquo;
                                         </p>
                                     </div>
                                 </div>
@@ -198,11 +198,11 @@ export const TwoProducts = () => {
                                 <div className="flex items-start justify-end gap-3">
                                     <div className="max-w-[85%] rounded-lg rounded-tr-none border border-[#E9E8E1] bg-white p-3.5 shadow-2xs">
                                         <p className="font-['Space_Grotesk'] text-[13px] leading-[20px] text-[#1B1C18]">
-                                            &ldquo;Hey Alex. Yeah, I have a few minutes. We&apos;re currently handling about 1,800 inquiries manually and we&apos;re looking to automate the qualification step.&rdquo;
+                                            &ldquo;Hey Aarav. Yeah, I have a few minutes. We&apos;re currently handling about 1,800 inquiries manually and we&apos;re looking to automate the qualification step.&rdquo;
                                         </p>
                                     </div>
                                     <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#E9E8E1]">
-                                        <span className="font-['Space_Grotesk'] text-[10px] font-bold text-[#1B1C18]">LM</span>
+                                        <span className="font-['Space_Grotesk'] text-[10px] font-bold text-[#1B1C18]">AM</span>
                                     </div>
                                 </div>
 
