@@ -1,3 +1,5 @@
+import { ComingSoonButton } from "@/components/ui/ComingSoon";
+
 export const OutboundCalls = () => {
     return (
         <section className="w-full border-t border-[#E9E8E1] bg-[#FBF9F2] py-20 md:py-28">
@@ -44,13 +46,10 @@ export const OutboundCalls = () => {
                         </div>
 
                         <div className="mt-8">
-                            <a
-                                href="#campaigns"
-                                className="inline-flex items-center gap-1.5 font-['Space_Grotesk'] text-[13px] font-semibold text-[#1B1C18] transition hover:gap-2.5"
-                            >
+                            <ComingSoonButton className="inline-flex items-center gap-1.5 font-['Space_Grotesk'] text-[13px] font-semibold text-[#1B1C18] transition hover:gap-2.5">
                                 <span>Explore Campaigns feature</span>
                                 <span>→</span>
-                            </a>
+                            </ComingSoonButton>
                         </div>
                     </div>
 

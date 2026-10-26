@@ -2,6 +2,7 @@ import { Hero_top_left } from "@/components/utils/hero_top_left";
 import { Hero_top_right } from "@/components/utils/hero_top_right";
 import { Hero_bottom_left } from "@/components/utils/hero_bottom_left";
 import { Hero_bottom_right } from "@/components/utils/hero_bottom_right";
+import { ComingSoonButton } from "@/components/ui/ComingSoon";
 
 export const Hero = () => {
     return (
@@ -69,13 +70,10 @@ export const Hero = () => {
                         placeholder="Enter your work email"
                         className="h-11 flex-1 rounded-md border border-[#E9E8E1] bg-white px-4 font-['Space_Grotesk'] text-[13px] text-[#1B1C18] placeholder-[#747878] shadow-xs outline-none transition focus:border-[#1B1C18]"
                     />
-                    <button
-                        type="button"
-                        className="flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-md bg-[#1B1C18] px-5 font-['Space_Grotesk'] text-[13px] font-medium text-white shadow-xs transition-colors duration-200 hover:bg-[#3A3B37]"
-                    >
+                    <ComingSoonButton className="flex h-11 shrink-0 items-center justify-center gap-1.5 rounded-md bg-[#1B1C18] px-5 font-['Space_Grotesk'] text-[13px] font-medium text-white shadow-xs transition-colors duration-200 hover:bg-[#3A3B37]">
                         Start free trial
                         <span>→</span>
-                    </button>
+                    </ComingSoonButton>
                 </div>
 
                 {/* Sub-text guarantee */}

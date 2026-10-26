@@ -6,7 +6,7 @@ export const Hero_bottom_left = () => {
                     COST PER CONVERSION
                 </span>
                 <span className="rounded bg-[#E3FCEF] px-1.5 py-0.5 font-['Space_Grotesk'] text-[10px] font-medium text-[#22A06B]">
-                    -78% vs human
+                    -99% vs human
                 </span>
             </div>
 
@@ -20,7 +20,7 @@ export const Hero_bottom_left = () => {
             </div>
 
             <p className="mt-1 font-['Space_Grotesk'] text-[10px] text-[#747878]">
-                Based on 14,200 conversations
+                Based on 14,200 outbound conversations
             </p>
         </div>
     );

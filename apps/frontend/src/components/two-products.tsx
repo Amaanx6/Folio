@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ComingSoonButton } from "@/components/ui/ComingSoon";
 
 export const TwoProducts = () => {
     const [activeTab, setActiveTab] = useState<"campaigns" | "agent">("campaigns");
@@ -114,7 +115,7 @@ export const TwoProducts = () => {
                                 </div>
                                 <div className="mt-2 flex items-baseline gap-2">
                                     <span className="font-['Space_Grotesk'] text-[32px] font-bold text-[#1B1C18]">
-                                        412 min
+                                        525 min
                                     </span>
                                     <span className="font-['Space_Grotesk'] text-[11px] text-[#747878]">
                                         (Avg: 3m 42s)
@@ -137,14 +138,14 @@ export const TwoProducts = () => {
                                 </div>
                                 <div className="mt-2 flex items-baseline gap-2">
                                     <span className="font-['Space_Grotesk'] text-[32px] font-bold text-[#1B1C18]">
-                                        ₹0.03
+                                        ₹0.07
                                     </span>
                                     <span className="font-['Space_Grotesk'] text-[11px] text-[#747878]">
                                         / minute
                                     </span>
                                 </div>
                                 <p className="mt-2 font-['Space_Grotesk'] text-[11px] text-[#747878]">
-                                    vs outsourced call center rep ($1.85/min)
+                                    vs outsourced call center rep (₹18/min)
                                 </p>
                             </div>
                         </div>
@@ -171,12 +172,9 @@ export const TwoProducts = () => {
                                     <span className="rounded-full bg-[#EDE9FE] px-2.5 py-1 font-['Space_Grotesk'] text-[11px] font-semibold text-[#6D28D9]">
                                         ACTIVE CALL (02:44)
                                     </span>
-                                    <button
-                                        type="button"
-                                        className="rounded-md border border-[#E9E8E1] bg-white px-2.5 py-1 font-['Space_Grotesk'] text-[11px] font-medium text-[#EF4444] hover:bg-[#FEE2E2]"
-                                    >
+                                    <ComingSoonButton className="rounded-md border border-[#E9E8E1] bg-white px-2.5 py-1 font-['Space_Grotesk'] text-[11px] font-medium text-[#EF4444] hover:bg-[#FEE2E2]">
                                         End Call
-                                    </button>
+                                    </ComingSoonButton>
                                 </div>
                             </div>
 
@@ -227,12 +225,9 @@ export const TwoProducts = () => {
                                         Guardrail active: Compliance disclosure delivered and acknowledged.
                                     </span>
                                 </div>
-                                <button
-                                    type="button"
-                                    className="rounded bg-[#1B1C18] px-3 py-1 font-['Space_Grotesk'] text-[11px] font-medium text-white hover:bg-[#3A3B37]"
-                                >
+                                <ComingSoonButton className="rounded bg-[#1B1C18] px-3 py-1 font-['Space_Grotesk'] text-[11px] font-medium text-white hover:bg-[#3A3B37]">
                                     Inspect Telemetry
-                                </button>
+                                </ComingSoonButton>
                             </div>
                         </div>
                     </div>

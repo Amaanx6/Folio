@@ -1,3 +1,5 @@
+import { ComingSoonButton } from "@/components/ui/ComingSoon";
+
 export const CtaFooter = () => {
     return (
         <section className="w-full border-t border-[#E9E8E1] bg-[#FBF9F2]">
@@ -29,18 +31,12 @@ export const CtaFooter = () => {
                     </p>
 
                     <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-                        <button
-                            type="button"
-                            className="flex h-11 w-full items-center justify-center rounded-md bg-[#1B1C18] px-6 font-['Space_Grotesk'] text-[13px] font-semibold text-white shadow-xs transition-colors duration-200 hover:bg-[#3A3B37] sm:w-auto"
-                        >
+                        <ComingSoonButton className="flex h-11 w-full items-center justify-center rounded-md bg-[#1B1C18] px-6 font-['Space_Grotesk'] text-[13px] font-semibold text-white shadow-xs transition-colors duration-200 hover:bg-[#3A3B37] sm:w-auto">
                             Start 7-day free trial
-                        </button>
-                        <button
-                            type="button"
-                            className="flex h-11 w-full items-center justify-center rounded-md border border-[#E9E8E1] bg-[#F5F3EC] px-6 font-['Space_Grotesk'] text-[13px] font-semibold text-[#1B1C18] transition-colors duration-200 hover:bg-[#E9E8E1] sm:w-auto"
-                        >
+                        </ComingSoonButton>
+                        <ComingSoonButton className="flex h-11 w-full items-center justify-center rounded-md border border-[#E9E8E1] bg-[#F5F3EC] px-6 font-['Space_Grotesk'] text-[13px] font-semibold text-[#1B1C18] transition-colors duration-200 hover:bg-[#E9E8E1] sm:w-auto">
                             Schedule a demo
-                        </button>
+                        </ComingSoonButton>
                     </div>
 
                     <div className="mt-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 font-['Space_Grotesk'] text-[11px] text-[#747878]">
@@ -74,13 +70,12 @@ export const CtaFooter = () => {
                             </span>
                             {["Dialer", "Voice Agent", "Real-time QA", "State Machine", "Integrations", "Pricing"].map(
                                 (item) => (
-                                    <a
+                                    <ComingSoonButton
                                         key={item}
-                                        href="#"
-                                        className="font-['Space_Grotesk'] text-[13px] text-[#444748] transition hover:text-[#1B1C18]"
+                                        className="text-left font-['Space_Grotesk'] text-[13px] text-[#444748] transition hover:text-[#1B1C18]"
                                     >
                                         {item}
-                                    </a>
+                                    </ComingSoonButton>
                                 )
                             )}
                         </div>
@@ -92,13 +87,12 @@ export const CtaFooter = () => {
                             </span>
                             {["Outbound Sales", "Inbound Support", "Property Logistics", "Healthcare", "Financial Services"].map(
                                 (item) => (
-                                    <a
+                                    <ComingSoonButton
                                         key={item}
-                                        href="#"
-                                        className="font-['Space_Grotesk'] text-[13px] text-[#444748] transition hover:text-[#1B1C18]"
+                                        className="text-left font-['Space_Grotesk'] text-[13px] text-[#444748] transition hover:text-[#1B1C18]"
                                     >
                                         {item}
-                                    </a>
+                                    </ComingSoonButton>
                                 )
                             )}
                         </div>
@@ -110,13 +104,12 @@ export const CtaFooter = () => {
                             </span>
                             {["Documentation", "API Reference", "Compliance Guide", "System Status", "Security Whitepaper"].map(
                                 (item) => (
-                                    <a
+                                    <ComingSoonButton
                                         key={item}
-                                        href="#"
-                                        className="font-['Space_Grotesk'] text-[13px] text-[#444748] transition hover:text-[#1B1C18]"
+                                        className="text-left font-['Space_Grotesk'] text-[13px] text-[#444748] transition hover:text-[#1B1C18]"
                                     >
                                         {item}
-                                    </a>
+                                    </ComingSoonButton>
                                 )
                             )}
                         </div>
@@ -128,13 +121,12 @@ export const CtaFooter = () => {
                             </span>
                             {["About Us", "Customers", "Careers", "Privacy Policy", "Terms of Service"].map(
                                 (item) => (
-                                    <a
+                                    <ComingSoonButton
                                         key={item}
-                                        href="#"
-                                        className="font-['Space_Grotesk'] text-[13px] text-[#444748] transition hover:text-[#1B1C18]"
+                                        className="text-left font-['Space_Grotesk'] text-[13px] text-[#444748] transition hover:text-[#1B1C18]"
                                     >
                                         {item}
-                                    </a>
+                                    </ComingSoonButton>
                                 )
                             )}
                         </div>
