@@ -17,6 +17,11 @@ const newsreader = Newsreader({
 export const metadata: Metadata = {
   title: "Foolioo",
   description: "Foolioo",
+  icons: {
+    icon: "/favicon.svg",
+    shortcut: "/favicon.svg",
+    apple: "/favicon.svg",
+  },
 };
 
 export default function RootLayout({
