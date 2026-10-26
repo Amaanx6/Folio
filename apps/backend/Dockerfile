@@ -1,7 +1,7 @@
 # ─── Stage 1: Build ──────────────────────────────────────────────
-FROM node:22-slim AS builder
+FROM node:24.22.1-slim AS builder
 
-RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
+RUN npm install --global pnpm@10.17.1
 
 WORKDIR /app
 
@@ -26,9 +26,9 @@ RUN pnpm --filter @repo/db run build
 RUN pnpm --filter @repo/backend run build
 
 # ─── Stage 2: Production ─────────────────────────────────────────
-FROM node:22-slim AS runner
+FROM node:24.22.1-slim AS runner
 
-RUN corepack enable && corepack prepare pnpm@9.0.0 --activate
+RUN npm install --global pnpm@10.17.1
 
 WORKDIR /app
 

@@ -15,9 +15,15 @@ Folio is a TypeScript monorepo for an AI-powered outbound calling product. The c
 
 ## Requirements
 
-- Node.js 22 for the calling service (the backend database driver supports Node.js 18+)
-- pnpm 9
+- Node.js 24.22.1 (latest LTS release)
+- pnpm 10.17.1
 - Provider credentials for local calling-service development
+
+Install pnpm directly with npm:
+
+```sh
+npm install --global pnpm@10.17.1
+```
 
 Install workspace dependencies from the repository root:
 
