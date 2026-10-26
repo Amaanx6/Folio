@@ -1,3 +1,5 @@
+import { ComingSoonButton } from "@/components/ui/ComingSoon";
+
 export const VoiceAgent = () => {
     return (
         <section className="w-full border-t border-[#E9E8E1] bg-[#FBF9F2] py-20 md:py-28">
@@ -79,12 +81,9 @@ export const VoiceAgent = () => {
                             <span className="font-['Space_Grotesk'] text-[11px] text-[#747878]">
                                 12 Test cases passed • 0 Hallucinations detected
                             </span>
-                            <button
-                                type="button"
-                                className="rounded bg-[#1B1C18] px-3 py-1.5 font-['Space_Grotesk'] text-[11px] font-medium text-white hover:bg-[#3A3B37]"
-                            >
+                            <ComingSoonButton className="rounded bg-[#1B1C18] px-3 py-1.5 font-['Space_Grotesk'] text-[11px] font-medium text-white hover:bg-[#3A3B37]">
                                 Simulate Agent
-                            </button>
+                            </ComingSoonButton>
                         </div>
                     </div>
 
@@ -127,13 +126,10 @@ export const VoiceAgent = () => {
                         </div>
 
                         <div className="mt-8">
-                            <a
-                                href="#agent"
-                                className="inline-flex items-center gap-1.5 font-['Space_Grotesk'] text-[13px] font-semibold text-[#1B1C18] transition hover:gap-2.5"
-                            >
+                            <ComingSoonButton className="inline-flex items-center gap-1.5 font-['Space_Grotesk'] text-[13px] font-semibold text-[#1B1C18] transition hover:gap-2.5">
                                 <span>Build an AI agent today</span>
                                 <span>→</span>
-                            </a>
+                            </ComingSoonButton>
                         </div>
                     </div>
                 </div>

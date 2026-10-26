@@ -1,7 +1,7 @@
-
 "use client";
 
 import { useState } from "react";
+import { ComingSoonButton } from "@/components/ui/ComingSoon";
 
 const Navbar = () => {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -24,28 +24,31 @@ const Navbar = () => {
 
                     <div className="hidden items-center gap-4 pl-2 lg:flex xl:gap-6 xl:pl-8">
                         {dropdownItems.map((item) => (
-                            <div
+                            <ComingSoonButton
                                 key={item}
                                 className="flex cursor-pointer items-center gap-1"
                             >
                                 <p className={navItem}>{item}</p>
                                 <p className={dropdownArrow}>▾</p>
-                            </div>
+                            </ComingSoonButton>
                         ))}
                     </div>
                 </div>
 
                 <div className="hidden items-center gap-4 lg:flex xl:gap-6">
-                    <p className={`${navItem} cursor-pointer`}>Log in</p>
-                    <p className={`${navItem} cursor-pointer`}>Contact Sales</p>
-                    <p className={`${navItem} cursor-pointer`}>View Demo</p>
+                    <ComingSoonButton className={`${navItem} cursor-pointer`}>
+                        Log in
+                    </ComingSoonButton>
+                    <ComingSoonButton className={`${navItem} cursor-pointer`}>
+                        Contact Sales
+                    </ComingSoonButton>
+                    <ComingSoonButton className={`${navItem} cursor-pointer`}>
+                        View Demo
+                    </ComingSoonButton>
 
-                    <button
-                        type="button"
-                        className="flex h-9.5 shrink-0 items-center justify-center rounded-xs bg-black px-3 font-['Space_Grotesk'] text-[13px] font-medium leading-4.5 tracking-[0.13px] text-white transition-colors duration-200 hover:bg-[#8A8886] xl:px-4"
-                    >
+                    <ComingSoonButton className="flex h-9.5 shrink-0 items-center justify-center rounded-xs bg-black px-3 font-['Space_Grotesk'] text-[13px] font-medium leading-4.5 tracking-[0.13px] text-white transition-colors duration-200 hover:bg-[#8A8886] xl:px-4">
                         Start free trial
-                    </button>
+                    </ComingSoonButton>
                 </div>
 
                 <button
@@ -92,27 +95,30 @@ const Navbar = () => {
                 <div className="absolute left-0 top-full w-full border-t border-black/10 bg-[#FBF9F2] px-6 py-5 shadow-lg md:px-10 lg:hidden">
                     <div className="flex flex-col gap-5">
                         {dropdownItems.map((item) => (
-                            <div
+                            <ComingSoonButton
                                 key={item}
-                                className="flex cursor-pointer items-center justify-between"
+                                className="flex w-full cursor-pointer items-center justify-between"
                             >
                                 <p className={navItem}>{item}</p>
                                 <p className={dropdownArrow}>▾</p>
-                            </div>
+                            </ComingSoonButton>
                         ))}
 
                         <div className="my-1 border-t border-black/10" />
 
-                        <p className={`${navItem} cursor-pointer`}>Log in</p>
-                        <p className={`${navItem} cursor-pointer`}>Contact Sales</p>
-                        <p className={`${navItem} cursor-pointer`}>View Demo</p>
+                        <ComingSoonButton className={`${navItem} cursor-pointer text-left`}>
+                            Log in
+                        </ComingSoonButton>
+                        <ComingSoonButton className={`${navItem} cursor-pointer text-left`}>
+                            Contact Sales
+                        </ComingSoonButton>
+                        <ComingSoonButton className={`${navItem} cursor-pointer text-left`}>
+                            View Demo
+                        </ComingSoonButton>
 
-                        <button
-                            type="button"
-                            className="flex h-9.5 w-full items-center justify-center rounded-xs bg-black px-4 font-['Space_Grotesk'] text-[13px] font-medium leading-4.5 tracking-[0.13px] text-white transition-colors duration-200 hover:bg-[#8A8886]"
-                        >
+                        <ComingSoonButton className="flex h-9.5 w-full items-center justify-center rounded-xs bg-black px-4 font-['Space_Grotesk'] text-[13px] font-medium leading-4.5 tracking-[0.13px] text-white transition-colors duration-200 hover:bg-[#8A8886]">
                             Start free trial
-                        </button>
+                        </ComingSoonButton>
                     </div>
                 </div>
             )}

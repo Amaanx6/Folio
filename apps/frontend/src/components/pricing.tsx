@@ -1,3 +1,5 @@
+import { ComingSoonButton } from "@/components/ui/ComingSoon";
+
 export const Pricing = () => {
     const plans = [
         {
@@ -140,8 +142,7 @@ export const Pricing = () => {
                             </div>
 
                             <div className="mt-8 pt-4">
-                                <button
-                                    type="button"
+                                <ComingSoonButton
                                     className={`flex h-11 w-full items-center justify-center rounded-md font-['Space_Grotesk'] text-[13px] font-semibold transition-colors duration-200 ${
                                         plan.highlighted
                                             ? "bg-[#1B1C18] text-white hover:bg-[#3A3B37]"
@@ -149,7 +150,7 @@ export const Pricing = () => {
                                     }`}
                                 >
                                     {plan.cta}
-                                </button>
+                                </ComingSoonButton>
                             </div>
                         </div>
                     ))}
