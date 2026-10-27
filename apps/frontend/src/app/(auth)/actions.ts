@@ -1,8 +1,9 @@
 "use server";
 
 import { createClient } from "@/lib/supabase/server";
-import { signInSchema, signUpSchema } from "@/lib/validations/auth";
+import { signInSchema, signUpSchema, resetPasswordSchema } from "@/lib/validations/auth";
 import { redirect } from "next/navigation";
+import { headers } from "next/headers";
 
 // Define the state type for our forms
 export type AuthState = {
@@ -67,5 +68,44 @@ export async function signUpAction(prevState: AuthState, formData: FormData): Pr
     return { success: "Check your email to confirm your account." };
   }
 
+  redirect("/dashboard");
+}
+
+export async function forgotPasswordAction(prevState: AuthState, formData: FormData): Promise<AuthState> {
+  const email = formData.get("email") as string;
+
+  if (!email || !email.includes("@")) {
+    return { fieldErrors: { email: ["Please enter a valid email address."] } };
+  }
+
+  const supabase = await createClient();
+  const origin = (await headers()).get("origin");
+
+  // Send reset email. If the email doesn't exist, Supabase still returns success
+  // to prevent attackers from guessing which emails are registered.
+  await supabase.auth.resetPasswordForEmail(email, {
+    redirectTo: `${origin}/auth/callback?next=/reset-password`,
+  });
+
+  return { success: "If an account exists with this email, a reset link has been sent." };
+}
+
+export async function resetPasswordAction(prevState: AuthState, formData: FormData): Promise<AuthState> {
+  const password = formData.get("password") as string;
+
+  const validated = resetPasswordSchema.safeParse({ password });
+  if (!validated.success) {
+    return { fieldErrors: validated.error.flatten().fieldErrors };
+  }
+
+  const supabase = await createClient();
+  const { error } = await supabase.auth.updateUser({ 
+    password: validated.data.password 
+  });
+
+  if (error) {
+    return { error: "Failed to update password. Your session may have expired." };
+  }
+  
   redirect("/dashboard");
 }
