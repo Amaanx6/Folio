@@ -1,6 +1,34 @@
+"use client";
+
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import { createClient } from "@/lib/supabase/client";
+import { User } from "@supabase/supabase-js";
 import { ComingSoonButton } from "@/components/ui/ComingSoon";
 
 export const CtaFooter = () => {
+    const [user, setUser] = useState<User | null>(null);
+    const [isLoading, setIsLoading] = useState(true);
+    const supabase = createClient();
+
+    useEffect(() => {
+        const getInitialUser = async () => {
+            const { data: { user } } = await supabase.auth.getUser();
+            setUser(user);
+            setIsLoading(false);
+        };
+
+        getInitialUser();
+
+        const { data: { subscription } } = supabase.auth.onAuthStateChange(
+            (_event, session) => {
+                setUser(session?.user ?? null);
+            }
+        );
+
+        return () => subscription.unsubscribe();
+    }, [supabase]);
+
     return (
         <section className="w-full border-t border-[#E9E8E1] bg-[#FBF9F2]">
             {/* CTA Card Container */}
@@ -31,21 +59,43 @@ export const CtaFooter = () => {
                     </p>
 
                     <div className="mt-8 flex flex-col items-center justify-center gap-3 sm:flex-row">
-                        <ComingSoonButton className="flex h-11 w-full items-center justify-center rounded-md bg-[#1B1C18] px-6 font-['Space_Grotesk'] text-[13px] font-semibold text-white shadow-xs transition-colors duration-200 hover:bg-[#3A3B37] sm:w-auto">
-                            Start 7-day free trial
-                        </ComingSoonButton>
+                        {/* Primary Button Logic */}
+                        {!isLoading && (
+                            <>
+                                {user ? (
+                                    <Link 
+                                        href="/dashboard" 
+                                        className="flex h-11 w-full items-center justify-center rounded-md bg-[#1B1C18] px-6 font-['Space_Grotesk'] text-[13px] font-semibold text-white shadow-xs transition-colors duration-200 hover:bg-[#3A3B37] sm:w-auto"
+                                    >
+                                        Go to Dashboard
+                                    </Link>
+                                ) : (
+                                    <Link 
+                                        href="/sign-up" 
+                                        className="flex h-11 w-full items-center justify-center rounded-md bg-[#1B1C18] px-6 font-['Space_Grotesk'] text-[13px] font-semibold text-white shadow-xs transition-colors duration-200 hover:bg-[#3A3B37] sm:w-auto"
+                                    >
+                                        Start 7-day free trial
+                                    </Link>
+                                )}
+                            </>
+                        )}
+
+                        {/* Secondary Button */}
                         <ComingSoonButton className="flex h-11 w-full items-center justify-center rounded-md border border-[#E9E8E1] bg-[#F5F3EC] px-6 font-['Space_Grotesk'] text-[13px] font-semibold text-[#1B1C18] transition-colors duration-200 hover:bg-[#E9E8E1] sm:w-auto">
                             Schedule a demo
                         </ComingSoonButton>
                     </div>
 
-                    <div className="mt-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 font-['Space_Grotesk'] text-[11px] text-[#747878]">
-                        <span>7-day free trial</span>
-                        <span>•</span>
-                        <span>No credit card required</span>
-                        <span>•</span>
-                        <span>Cancel anytime</span>
-                    </div>
+                    {/* Sub-text guarantee (Hide if logged in) */}
+                    {!isLoading && !user && (
+                        <div className="mt-6 flex flex-wrap items-center justify-center gap-x-4 gap-y-1 font-['Space_Grotesk'] text-[11px] text-[#747878]">
+                            <span>7-day free trial</span>
+                            <span>•</span>
+                            <span>No credit card required</span>
+                            <span>•</span>
+                            <span>Cancel anytime</span>
+                        </div>
+                    )}
                 </div>
             </div>
 
