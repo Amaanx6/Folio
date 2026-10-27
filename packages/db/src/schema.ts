@@ -177,14 +177,14 @@ export const campaigns = pgTable("campaigns", {
 export const users = pgTable("users", {
   id: uuid("id").primaryKey().defaultRandom(),
   clientId: uuid("client_id").references(() => clients.id),
-  firebaseUid: text("firebase_uid").unique(),
+  authUserId: text("auth_user_id").unique(),
   email: text("email"),
   phoneNumber: text("phone_number"),
   phoneVerified: boolean("phone_verified").notNull().default(false),
   emailVerified: boolean("email_verified").notNull().default(false),
   displayName: text("display_name"),
   avatarUrl: text("avatar_url"),
-  authProvider: text("auth_provider").default("firebase"), // 'google', 'github', 'phone', 'password'
+  authProvider: text("auth_provider").default("email"),
   passwordHash: text("password_hash"), // optional for OAuth/phone OTP
   role: userRoleEnum("role").notNull().default("client_admin"),
   lastLoginAt: timestamp("last_login_at"),

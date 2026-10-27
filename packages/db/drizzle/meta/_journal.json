@@ -85,6 +85,13 @@
       "when": 1791437279005,
       "tag": "0011_odd_magma",
       "breakpoints": true
+    },
+    {
+      "idx": 12,
+      "version": "7",
+      "when": 1793134200000,
+      "tag": "0012_supabase_auth_identity",
+      "breakpoints": true
     }
   ]
 }

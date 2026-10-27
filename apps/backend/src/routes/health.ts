@@ -1,6 +1,6 @@
 import type { Request, Response } from "express";
 import { checkDatabaseHealth } from "../config/db.js";
-import { isFirebaseConfigured } from "../config/firebase.js";
+import { isSupabaseAuthConfigured } from "../config/supabase.js";
 
 let isShuttingDownState = false;
 
@@ -27,7 +27,7 @@ export function getLivenessRoute(_req: Request, res: Response) {
 
 /**
  * Deep Readiness probe: checks dependencies before declaring readiness to accept traffic.
- * Checks Neon Postgres database connectivity and Firebase Admin state.
+ * Checks Neon Postgres database connectivity and Supabase Auth configuration.
  * Returns 503 if the service is draining or if critical dependencies are unreachable.
  */
 export async function getReadinessRoute(_req: Request, res: Response) {
@@ -40,7 +40,7 @@ export async function getReadinessRoute(_req: Request, res: Response) {
   }
 
   const dbHealth = await checkDatabaseHealth();
-  const firebaseReady = isFirebaseConfigured();
+  const supabaseAuthReady = isSupabaseAuthConfigured();
 
   const isHealthy = dbHealth.ok;
   const statusCode = isHealthy ? 200 : 503;
@@ -55,8 +55,8 @@ export async function getReadinessRoute(_req: Request, res: Response) {
         latencyMs: dbHealth.latencyMs,
         ...(dbHealth.error ? { error: dbHealth.error } : {}),
       },
-      firebase: {
-        status: firebaseReady ? "initialized" : "not_configured",
+      supabaseAuth: {
+        status: supabaseAuthReady ? "configured" : "not_configured",
       },
     },
   });

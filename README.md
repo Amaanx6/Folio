@@ -67,16 +67,15 @@ Create `apps/backend/.env` locally; never commit it:
 
 ```text
 DATABASE_URL=
-FIREBASE_PROJECT_ID=
-FIREBASE_CLIENT_EMAIL=
-FIREBASE_PRIVATE_KEY=
+SUPABASE_URL=
+SUPABASE_PUBLISHABLE_KEY=
 CALLING_SERVICE_URL=http://localhost:3000
 CALLING_SERVICE_SECRET=
 WEBHOOK_SECRET=
 BACKEND_WORKER_SECRET=
 ```
 
-`CALLING_SERVICE_SECRET` must match the calling service's value. `WEBHOOK_SECRET` must match the calling service's value and protects `POST /api/calls/complete`. `BACKEND_WORKER_SECRET` protects `POST /api/queue/process` and should be configured only for the trusted scheduler. Authentication-dependent backend APIs fail closed until Firebase Admin credentials are configured.
+`SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` are the same Supabase project URL and publishable key used by the frontend. The backend uses them to verify Supabase access tokens; the Neon database remains the source of application and workspace data. `CALLING_SERVICE_SECRET` must match the calling service's value. `WEBHOOK_SECRET` must match the calling service's value and protects `POST /api/calls/complete`. `BACKEND_WORKER_SECRET` protects `POST /api/queue/process` and should be configured only for the trusted scheduler. Authentication-dependent backend APIs fail closed until Supabase Auth is configured.
 
 Run the backend:
 
@@ -95,6 +94,8 @@ The calling service also requires `CALLING_SERVICE_SECRET`, `WEBHOOK_SECRET`, an
 
 The backend uses Neon’s WebSocket pool driver because worker, provisioning, queue, phone-verification, and call-completion operations require database transactions. Apply reviewed Drizzle migrations to a non-production database first; do not use schema push or destructive resets as a production migration strategy.
 
+The Supabase Auth migration renames the stored identity column without dropping existing user data. Apply pending migrations with `pnpm --filter @repo/db db:migrate` before deploying the updated backend. Existing Firebase-linked user records are reused at first Supabase sign-in only when Supabase confirms the same email address.
+
 ## Deployment and validation
 
 The repository-root `railway.toml` builds `apps/backend/Dockerfile` and checks `/health`. From the repository root, link the CLI to the Railway project and backend service, then deploy with:
@@ -104,7 +105,7 @@ railway link
 railway up --service <backend-service-name>
 ```
 
-Configure the backend service's environment variables in Railway; local `.env` values are not deployed automatically. Set `DATABASE_URL`, Firebase Admin credentials (`FIREBASE_PROJECT_ID`, `FIREBASE_CLIENT_EMAIL`, and `FIREBASE_PRIVATE_KEY`), `CALLING_SERVICE_URL`, `WEBHOOK_SECRET`, and `BACKEND_WORKER_SECRET`. Set `ALLOWED_ORIGINS` to the deployed frontend origin(s), and make sure the calling service's `CALLBACK_URL` points to `https://<backend-host>/api/calls/complete`.
+Configure the backend service's environment variables in Railway; local `.env` values are not deployed automatically. Set `DATABASE_URL`, `SUPABASE_URL`, `SUPABASE_PUBLISHABLE_KEY`, `CALLING_SERVICE_URL`, `WEBHOOK_SECRET`, and `BACKEND_WORKER_SECRET`. Set `ALLOWED_ORIGINS` to the deployed frontend origin(s), and make sure the calling service's `CALLBACK_URL` points to `https://<backend-host>/api/calls/complete`.
 
 The calling service has a separate config at `apps/calling/railway.json`. To keep its GitHub Actions deployment building the calling Dockerfile, set the calling Railway service's Config as Code path to `/apps/calling/railway.json` in Railway service settings. The backend service should use the root `railway.toml`.
 

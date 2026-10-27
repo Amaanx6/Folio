@@ -1,8 +1,8 @@
 import { timingSafeEqual } from "node:crypto";
 import type { Request, Response, NextFunction } from "express";
 import { eq } from "drizzle-orm";
-import type { DecodedIdToken } from "firebase-admin/auth";
-import { verifyFirebaseToken, adminAuth } from "../config/firebase.js";
+import type { User } from "@supabase/supabase-js";
+import { isSupabaseAuthConfigured, verifySupabaseToken } from "../config/supabase.js";
 import { db } from "../config/db.js";
 import { env } from "../config/env.js";
 import { users } from "@repo/db";
@@ -12,8 +12,7 @@ declare global {
     interface Request {
       user?: typeof users.$inferSelect;
       clientId?: string;
-      firebaseUid?: string;
-      firebaseToken?: DecodedIdToken;
+      supabaseUser?: User;
     }
   }
 }
@@ -25,7 +24,7 @@ export function getBearerToken(req: Request): string | undefined {
 }
 
 export async function requireAuth(req: Request, res: Response, next: NextFunction) {
-  if (!adminAuth) {
+  if (!isSupabaseAuthConfigured()) {
     return res.status(503).json({ ok: false, error: "Authentication service is not configured" });
   }
 
@@ -34,22 +33,21 @@ export async function requireAuth(req: Request, res: Response, next: NextFunctio
     return res.status(401).json({ ok: false, error: "A valid Bearer token is required" });
   }
 
-  let decodedToken: DecodedIdToken;
+  let supabaseUser: User;
   try {
-    decodedToken = await verifyFirebaseToken(idToken);
+    supabaseUser = await verifySupabaseToken(idToken);
   } catch (err: unknown) {
-    console.warn("[middleware/auth] Firebase token verification failed:", err);
+    console.warn("[middleware/auth] Supabase access token verification failed:", err);
     return res.status(401).json({ ok: false, error: "Unauthorized: Invalid or expired token" });
   }
 
-  req.firebaseUid = decodedToken.uid;
-  req.firebaseToken = decodedToken;
+  req.supabaseUser = supabaseUser;
 
   try {
     const [user] = await db
       .select()
       .from(users)
-      .where(eq(users.firebaseUid, decodedToken.uid))
+      .where(eq(users.authUserId, supabaseUser.id))
       .limit(1);
 
     if (user) {

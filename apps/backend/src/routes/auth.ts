@@ -1,7 +1,11 @@
 import type { Request, Response } from "express";
-import { eq } from "drizzle-orm";
+import { eq, sql } from "drizzle-orm";
 import { db } from "../config/db.js";
 import { clients, users } from "@repo/db";
+
+function metadataString(value: unknown): string | null {
+  return typeof value === "string" && value.trim() ? value : null;
+}
 
 function publicUser(user: typeof users.$inferSelect) {
   return {
@@ -22,33 +26,33 @@ function publicUser(user: typeof users.$inferSelect) {
 }
 
 function readProfile(req: Request) {
-  const token = req.firebaseToken!;
-  const phoneNumber = typeof token.phone_number === "string" ? token.phone_number : null;
+  const authUser = req.supabaseUser!;
+  const metadata = authUser.user_metadata;
+  const phoneNumber = authUser.phone_confirmed_at ? authUser.phone : null;
+  const email = metadataString(authUser.email)?.trim().toLowerCase() ?? null;
 
   return {
-    firebaseUid: token.uid,
-    email: typeof token.email === "string" ? token.email : null,
+    authUserId: authUser.id,
+    email,
+    emailVerified: Boolean(authUser.email_confirmed_at),
     phoneNumber,
     phoneVerified: phoneNumber !== null,
-    displayName: typeof token.name === "string" ? token.name : null,
-    avatarUrl: typeof token.picture === "string" ? token.picture : null,
-    authProvider:
-      typeof token.firebase?.sign_in_provider === "string"
-        ? token.firebase.sign_in_provider
-        : "firebase",
+    displayName: metadataString(metadata.full_name) ?? metadataString(metadata.name),
+    avatarUrl: metadataString(metadata.avatar_url) ?? metadataString(metadata.picture),
+    authProvider: metadataString(authUser.app_metadata.provider) ?? "email",
   };
 }
 
 /**
  * POST /api/auth/sync
  *
- * Provisions the signed-in Firebase identity and its initial workspace.
- * Profile identity fields are always sourced from verified token claims.
+ * Provisions the signed-in Supabase identity and its initial workspace.
+ * Profile identity fields are sourced from the verified Supabase user.
  */
 export async function syncAuthUserRoute(req: Request, res: Response) {
   try {
-    if (!req.firebaseToken) {
-      return res.status(401).json({ ok: false, error: "Verified Firebase identity is required" });
+    if (!req.supabaseUser) {
+      return res.status(401).json({ ok: false, error: "Verified Supabase identity is required" });
     }
 
     const profile = readProfile(req);
@@ -63,26 +67,42 @@ export async function syncAuthUserRoute(req: Request, res: Response) {
     const [existingByUid] = await db
       .select()
       .from(users)
-      .where(eq(users.firebaseUid, profile.firebaseUid))
+      .where(eq(users.authUserId, profile.authUserId))
       .limit(1);
 
-    if (!existingByUid && profile.email) {
-      const [existingByEmail] = await db
-        .select({ id: users.id, firebaseUid: users.firebaseUid })
+    const [existingByEmail] =
+      !existingByUid && profile.email
+        ? await db
+        .select({ id: users.id, authUserId: users.authUserId })
         .from(users)
-        .where(eq(users.email, profile.email))
-        .limit(1);
+        .where(sql`lower(${users.email}) = ${profile.email}`)
+        .limit(1)
+        : [];
 
-      if (existingByEmail && existingByEmail.firebaseUid !== profile.firebaseUid) {
-        return res.status(409).json({
-          ok: false,
-          error: "This email is already associated with another sign-in identity",
-        });
-      }
+    if (existingByEmail && !profile.emailVerified) {
+      return res.status(409).json({
+        ok: false,
+        error: "Verify your email before linking this sign-in to an existing account",
+      });
+    }
+
+    if (
+      existingByEmail?.authUserId &&
+      /^[0-9a-f]{8}-[0-9a-f]{4}-[1-8][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i.test(existingByEmail.authUserId) &&
+      existingByEmail.authUserId !== profile.authUserId
+    ) {
+      return res.status(409).json({
+        ok: false,
+        error: "This email is already associated with another sign-in identity",
+      });
     }
 
     const result = await db.transaction(async (tx) => {
-      let clientId = existingByUid?.clientId ?? null;
+      const [emailMatchedUser] = existingByEmail
+        ? await tx.select().from(users).where(eq(users.id, existingByEmail.id)).limit(1)
+        : [];
+      const existingUser = existingByUid ?? emailMatchedUser;
+      let clientId = existingUser?.clientId ?? null;
 
       if (!clientId) {
         const [client] = await tx
@@ -109,32 +129,33 @@ export async function syncAuthUserRoute(req: Request, res: Response) {
         throw new Error("Failed to provision a workspace");
       }
 
-      const [user] = existingByUid
+      const [user] = existingUser
         ? await tx
             .update(users)
             .set({
               clientId,
-              email: profile.email ?? existingByUid.email,
-              phoneNumber: profile.phoneNumber ?? existingByUid.phoneNumber,
-              phoneVerified: profile.phoneVerified || existingByUid.phoneVerified,
-              emailVerified: Boolean(req.firebaseToken?.email_verified),
-              displayName: profile.displayName ?? existingByUid.displayName,
-              avatarUrl: profile.avatarUrl ?? existingByUid.avatarUrl,
+              authUserId: profile.authUserId,
+              email: profile.email ?? existingUser.email,
+              phoneNumber: profile.phoneNumber ?? existingUser.phoneNumber,
+              phoneVerified: profile.phoneVerified || existingUser.phoneVerified,
+              emailVerified: profile.emailVerified || existingUser.emailVerified,
+              displayName: profile.displayName ?? existingUser.displayName,
+              avatarUrl: profile.avatarUrl ?? existingUser.avatarUrl,
               authProvider: profile.authProvider,
               lastLoginAt: new Date(),
               updatedAt: new Date(),
             })
-            .where(eq(users.id, existingByUid.id))
+            .where(eq(users.id, existingUser.id))
             .returning()
         : await tx
             .insert(users)
             .values({
-              firebaseUid: profile.firebaseUid,
+              authUserId: profile.authUserId,
               clientId,
               email: profile.email,
               phoneNumber: profile.phoneNumber,
               phoneVerified: profile.phoneVerified,
-              emailVerified: Boolean(req.firebaseToken?.email_verified),
+              emailVerified: profile.emailVerified,
               displayName: profile.displayName,
               avatarUrl: profile.avatarUrl,
               authProvider: profile.authProvider,
@@ -192,14 +213,14 @@ export async function getAuthMeRoute(req: Request, res: Response) {
 /**
  * PATCH /api/auth/phone
  *
- * Store only a phone number asserted by Firebase's verified token claims.
+ * Store only a phone number asserted by Supabase's verified user record.
  */
 export async function updateAuthPhoneRoute(req: Request, res: Response) {
-  const profile = req.firebaseToken ? readProfile(req) : undefined;
+  const profile = req.supabaseUser ? readProfile(req) : undefined;
   if (!profile?.phoneNumber || !req.user) {
     return res.status(403).json({
       ok: false,
-      error: "A verified Firebase phone sign-in and an existing user profile are required",
+      error: "A verified Supabase phone sign-in and an existing user profile are required",
     });
   }
 

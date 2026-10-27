@@ -36,7 +36,7 @@ export function registerRoutes(app: Express) {
 
   const api = Router();
 
-  // Rate-limited Auth endpoints (Firebase session validation)
+  // Rate-limited Auth endpoints (Supabase access-token validation)
   api.post("/auth/sync", authRateLimiter, requireAuth, syncAuthUserRoute);
   api.get("/auth/me", authRateLimiter, requireAuth, getAuthMeRoute);
   api.patch("/auth/phone", authRateLimiter, requireAuth, updateAuthPhoneRoute);

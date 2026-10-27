@@ -39,11 +39,10 @@ export const env = {
   /** Secrets for machine-to-machine route authorization */
   webhookSecret: process.env.WEBHOOK_SECRET?.trim() || process.env.CALLING_WEBHOOK_SECRET?.trim(),
   workerSecret: process.env.BACKEND_WORKER_SECRET?.trim(),
-  /** Firebase Admin Credentials */
-  firebase: {
-    projectId: process.env.FIREBASE_PROJECT_ID?.trim(),
-    clientEmail: process.env.FIREBASE_CLIENT_EMAIL?.trim(),
-    privateKey: process.env.FIREBASE_PRIVATE_KEY?.trim(),
+  /** Supabase Auth API credentials */
+  supabase: {
+    url: process.env.SUPABASE_URL?.trim(),
+    publishableKey: process.env.SUPABASE_PUBLISHABLE_KEY?.trim(),
   },
 };
 
@@ -90,9 +89,9 @@ export function validateEnv(): void {
       );
     }
 
-    if (!env.firebase.projectId || !env.firebase.clientEmail || !env.firebase.privateKey) {
+    if (!env.supabase.url || !env.supabase.publishableKey) {
       console.warn(
-        "[security/config] ⚠️ WARNING: Firebase Admin credentials are incomplete. End-user authentication will fail."
+        "[security/config] ⚠️ WARNING: Supabase Auth credentials are incomplete. End-user authentication will fail."
       );
     }
   }
