@@ -4,8 +4,15 @@ import { createClient } from "@/lib/supabase/server";
 import { signInSchema, signUpSchema, resetPasswordSchema } from "@/lib/validations/auth";
 import { redirect } from "next/navigation";
 import { headers } from "next/headers";
+import { Ratelimit } from "@upstash/ratelimit";
+import { Redis } from "@upstash/redis";
 
-// Define the state type for our forms
+// Initialize Upstash Rate Limiter (5 requests per minute per IP)
+const ratelimit = new Ratelimit({
+  redis: Redis.fromEnv(),
+  limiter: Ratelimit.slidingWindow(5, "1 m"),
+});
+
 export type AuthState = {
   error?: string;
   fieldErrors?: Record<string, string[]>;
@@ -13,16 +20,23 @@ export type AuthState = {
 } | null;
 
 export async function signInAction(prevState: AuthState, formData: FormData): Promise<AuthState> {
+  // 1. Rate Limiting
+  const ip = (await headers()).get("x-forwarded-for") ?? "127.0.0.1";
+  const { success } = await ratelimit.limit(`signin_${ip}`);
+  if (!success) {
+    return { error: "Too many login attempts. Please try again in a minute." };
+  }
+
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 
-  // 1. Validate with Zod
+  // 2. Validate
   const validated = signInSchema.safeParse({ email, password });
   if (!validated.success) {
     return { fieldErrors: validated.error.flatten().fieldErrors };
   }
 
-  // 2. Authenticate with Supabase
+  // 3. Authenticate
   const supabase = await createClient();
   const { error } = await supabase.auth.signInWithPassword({
     email: validated.data.email,
@@ -30,40 +44,53 @@ export async function signInAction(prevState: AuthState, formData: FormData): Pr
   });
 
   if (error) {
-    // Return generic error to prevent email enumeration attacks
+    // Return generic error to prevent email enumeration
     return { error: "Invalid email or password." };
   }
 
-  // 3. Redirect on success (must be outside try/catch in Server Actions)
   redirect("/dashboard");
 }
 
 export async function signUpAction(prevState: AuthState, formData: FormData): Promise<AuthState> {
+  // 1. Rate Limiting
+  const ip = (await headers()).get("x-forwarded-for") ?? "127.0.0.1";
+  const { success } = await ratelimit.limit(`signup_${ip}`);
+  if (!success) {
+    return { error: "Too many sign-up attempts. Please try again in a minute." };
+  }
+
   const name = formData.get("name") as string;
   const email = formData.get("email") as string;
   const password = formData.get("password") as string;
 
+  // 2. Validate
   const validated = signUpSchema.safeParse({ name, email, password });
   if (!validated.success) {
     return { fieldErrors: validated.error.flatten().fieldErrors };
   }
 
+  // 3. Create User
   const supabase = await createClient();
   const { data, error } = await supabase.auth.signUp({
     email: validated.data.email,
     password: validated.data.password,
     options: {
       data: {
-        full_name: validated.data.name, // Save the name in Supabase user metadata
+        full_name: validated.data.name,
       },
     },
   });
 
   if (error) {
-    return { error: error.message };
+    // SECURITY FIX: Log the real error server-side, but don't leak it to the client
+    console.error("Supabase Signup Error:", error.message);
+    
+    if (error.message.toLowerCase().includes("already registered") || error.message.toLowerCase().includes("already exists")) {
+      return { error: "An account with this email already exists." };
+    }
+    return { error: "Could not create account. Please try again." };
   }
 
-  // If Supabase requires email confirmation, session will be null
   if (data.session === null) {
     return { success: "Check your email to confirm your account." };
   }
@@ -72,6 +99,13 @@ export async function signUpAction(prevState: AuthState, formData: FormData): Pr
 }
 
 export async function forgotPasswordAction(prevState: AuthState, formData: FormData): Promise<AuthState> {
+  // 1. Rate Limiting
+  const ip = (await headers()).get("x-forwarded-for") ?? "127.0.0.1";
+  const { success } = await ratelimit.limit(`forgot_${ip}`);
+  if (!success) {
+    return { error: "Too many requests. Please try again in a minute." };
+  }
+
   const email = formData.get("email") as string;
 
   if (!email || !email.includes("@")) {
@@ -81,8 +115,6 @@ export async function forgotPasswordAction(prevState: AuthState, formData: FormD
   const supabase = await createClient();
   const origin = (await headers()).get("origin");
 
-  // Send reset email. If the email doesn't exist, Supabase still returns success
-  // to prevent attackers from guessing which emails are registered.
   await supabase.auth.resetPasswordForEmail(email, {
     redirectTo: `${origin}/auth/callback?next=/reset-password`,
   });
