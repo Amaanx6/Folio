@@ -75,7 +75,7 @@ WEBHOOK_SECRET=
 BACKEND_WORKER_SECRET=
 ```
 
-`SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` are the same Supabase project URL and publishable key used by the frontend. The backend uses them to verify Supabase access tokens; the Neon database remains the source of application and workspace data. `CALLING_SERVICE_SECRET` must match the calling service's value. `WEBHOOK_SECRET` must match the calling service's value and protects `POST /api/calls/complete`. `BACKEND_WORKER_SECRET` protects `POST /api/queue/process` and should be configured only for the trusted scheduler. Authentication-dependent backend APIs fail closed until Supabase Auth is configured.
+`SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` are the same Supabase project URL and publishable key used by the frontend. The backend also accepts `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY`. It uses these values to verify Supabase access tokens; the Neon database remains the source of application and workspace data. `CALLING_SERVICE_SECRET` must match the calling service's value. `WEBHOOK_SECRET` must match the calling service's value and protects `POST /api/calls/complete`. `BACKEND_WORKER_SECRET` protects `POST /api/queue/process` and should be configured only for the trusted scheduler. Authentication-dependent backend APIs fail closed until Supabase Auth is configured.
 
 Run the backend:
 

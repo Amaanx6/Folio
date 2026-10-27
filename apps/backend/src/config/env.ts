@@ -41,8 +41,10 @@ export const env = {
   workerSecret: process.env.BACKEND_WORKER_SECRET?.trim(),
   /** Supabase Auth API credentials */
   supabase: {
-    url: process.env.SUPABASE_URL?.trim(),
-    publishableKey: process.env.SUPABASE_PUBLISHABLE_KEY?.trim(),
+    url: process.env.SUPABASE_URL?.trim() || process.env.NEXT_PUBLIC_SUPABASE_URL?.trim(),
+    publishableKey:
+      process.env.SUPABASE_PUBLISHABLE_KEY?.trim() ||
+      process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY?.trim(),
   },
 };
 
