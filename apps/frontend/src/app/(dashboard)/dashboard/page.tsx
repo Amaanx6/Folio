@@ -13,11 +13,11 @@ export default function DashboardPage() {
     setLoading(true);
     await supabase.auth.signOut();
     router.push("/sign-in");
-    router.refresh(); // Force a refresh to clear server-side cached state
+    router.refresh();
   };
 
   return (
-    <div className="flex h-[80vh] flex-col items-center justify-center text-center">
+    <div className="flex h-[70vh] flex-col items-center justify-center text-center">
       <h1 className="font-['Newsreader'] text-[36px] font-normal text-[#1B1C18]">
         Dashboard is coming soon.
       </h1>
