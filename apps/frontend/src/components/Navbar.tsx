@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { ComingSoonButton } from "@/components/ui/ComingSoon";
+import Link from "next/link";
 
 const Navbar = () => {
     const [menuOpen, setMenuOpen] = useState(false);
@@ -36,9 +37,10 @@ const Navbar = () => {
                 </div>
 
                 <div className="hidden items-center gap-4 lg:flex xl:gap-6">
-                    <ComingSoonButton className={`${navItem} cursor-pointer`}>
+                    <Link href="/sign-in" className={`${navItem} cursor-pointer`}>
                         Log in
-                    </ComingSoonButton>
+                    </Link>
+
                     <ComingSoonButton className={`${navItem} cursor-pointer`}>
                         Contact Sales
                     </ComingSoonButton>
@@ -46,9 +48,9 @@ const Navbar = () => {
                         View Demo
                     </ComingSoonButton>
 
-                    <ComingSoonButton className="flex h-9.5 shrink-0 items-center justify-center rounded-xs bg-black px-3 font-['Space_Grotesk'] text-[13px] font-medium leading-4.5 tracking-[0.13px] text-white transition-colors duration-200 hover:bg-[#8A8886] xl:px-4">
+                    <Link href="/sign-up" className="flex h-9.5 shrink-0 items-center justify-center rounded-xs bg-black px-3 font-['Space_Grotesk'] text-[13px] font-medium leading-4.5 tracking-[0.13px] text-white transition-colors duration-200 hover:bg-[#8A8886] xl:px-4">
                         Start free trial
-                    </ComingSoonButton>
+                    </Link>
                 </div>
 
                 <button
