@@ -33,7 +33,7 @@ export const Hero = () => {
     }, [supabase]);
 
     return (
-        <section className="relative mx-auto w-full max-w-7xl overflow-hidden px-6 pb-20 pt-10 md:px-10 md:pb-28 md:pt-16 lg:px-12">
+        <section id="demo" className="relative mx-auto w-full max-w-7xl overflow-hidden px-6 pb-20 pt-10 md:px-10 md:pb-28 md:pt-16 lg:px-12">
             {/* Floating cards for desktop view */}
             <div className="pointer-events-none absolute left-2 top-16 hidden xl:block">
                 <div className="pointer-events-auto">

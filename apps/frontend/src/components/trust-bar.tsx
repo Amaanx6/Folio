@@ -47,7 +47,7 @@ export const TrustBar = () => {
     ];
 
     return (
-        <section className="w-full border-b border-[#E9E8E1] bg-[#FBF9F2] py-12">
+        <section id="customers" className="w-full border-b border-[#E9E8E1] bg-[#FBF9F2] py-12">
             <div className="mx-auto max-w-[1280px] px-6 text-center md:px-10">
                 <p className="font-['Space_Grotesk'] text-[11px] font-medium uppercase tracking-[1.2px] text-[#747878]">
                     Trusted by operations & revenue teams at high-growth companies

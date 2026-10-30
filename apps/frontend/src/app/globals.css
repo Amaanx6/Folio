@@ -1,7 +1,10 @@
 @import "tailwindcss";
-@import "tailwindcss";
 
 @theme inline {
   --font-sans: var(--font-space-grotesk);
   --font-newsreader: var(--font-newsreader);
+}
+
+html {
+  scroll-behavior: smooth;
 }
