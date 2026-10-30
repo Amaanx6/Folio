@@ -176,6 +176,77 @@ const StatusPill = ({
     );
 };
 
+type GlassTabsProps<T extends string> = {
+    value: T;
+    onChange: (value: T) => void;
+    options: { value: T; label: string }[];
+    ariaLabel: string;
+    idPrefix: string;
+    className?: string;
+};
+
+/**
+ * Shared two-way segmented control. The glass highlight moves independently
+ * of the content, so each option behaves like a real tab rather than a toggle.
+ */
+const GlassTabs = <T extends string,>({
+    value,
+    onChange,
+    options,
+    ariaLabel,
+    idPrefix,
+    className = "",
+}: GlassTabsProps<T>) => {
+    const selectedIndex = Math.max(0, options.findIndex((option) => option.value === value));
+
+    return (
+        <div
+            className={`relative isolate grid w-full grid-cols-2 items-center rounded-full border border-white/80 bg-[#EAE8E1]/80 p-1 shadow-[inset_0_1px_2px_rgba(35,36,30,0.06)] backdrop-blur-xl ${className}`}
+            role="tablist"
+            aria-label={ariaLabel}
+        >
+            <span
+                aria-hidden="true"
+                className="pointer-events-none absolute bottom-1 top-1 z-0 w-[calc(50%-4px)] rounded-full border border-white/90"
+                style={{
+                    left: selectedIndex === 0 ? "4px" : "50%",
+                    background:
+                        "linear-gradient(135deg, rgba(255,255,255,0.98) 0%, rgba(255,255,255,0.76) 100%)",
+                    boxShadow:
+                        "0 4px 14px rgba(35,36,30,0.11), inset 0 1px 0 rgba(255,255,255,0.96)",
+                    backdropFilter: "blur(18px)",
+                    WebkitBackdropFilter: "blur(18px)",
+                    transition: "left 480ms cubic-bezier(0.22, 1, 0.36, 1)",
+                }}
+            />
+
+            {options.map((option) => {
+                const isActive = option.value === value;
+
+                return (
+                    <button
+                        key={option.value}
+                        type="button"
+                        role="tab"
+                        id={`${idPrefix}-${option.value}-tab`}
+                        aria-selected={isActive}
+                        aria-controls={`${idPrefix}-panel`}
+                        tabIndex={isActive ? 0 : -1}
+                        onClick={() => onChange(option.value)}
+                        className={`relative z-10 flex h-10 min-w-0 items-center justify-center whitespace-nowrap rounded-full px-2.5 font-['Space_Grotesk'] text-[10px] font-semibold tracking-[0.1px] transition-colors duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#8B70D6] focus-visible:ring-offset-2 sm:px-4 sm:text-[11px] ${
+                            isActive
+                                ? "text-[#252720]"
+                                : "text-[#777B74] hover:text-[#34372F]"
+                        }`}
+                    >
+                        {option.label}
+                    </button>
+                );
+            })}
+        </div>
+    );
+};
+
 const WorkflowPanel = ({
     selectedStep,
     onSelectStep,
@@ -507,6 +578,100 @@ const DecisionTracePanel = ({
     );
 };
 
+const HumanEscalationPanel = () => (
+    <section
+        id="human-escalation-demo"
+        className="mt-4 rounded-xl border border-[#DDD6FE] bg-[#FAF8FF] p-5 md:p-6"
+        aria-label="Human escalation walkthrough"
+    >
+        <div className="flex flex-wrap items-start justify-between gap-3">
+            <div>
+                <p className="font-['Space_Grotesk'] text-[10px] font-semibold uppercase tracking-[1.1px] text-[#7852D6]">
+                    Human-in-the-loop control
+                </p>
+                <h4 className="mt-1 font-['Space_Grotesk'] text-[16px] font-semibold text-[#292B26]">
+                    How a call reaches your team
+                </h4>
+                <p className="mt-1 max-w-[620px] font-['Space_Grotesk'] text-[11px] leading-[18px] text-[#747878]">
+                    When a configured escalation condition is met, the agent prepares the conversation context and routes the prospect to the right human team.
+                </p>
+            </div>
+            <StatusPill tone="purple">Illustrative handoff</StatusPill>
+        </div>
+
+        <div className="mt-5 grid grid-cols-1 gap-3 md:grid-cols-3">
+            <div className="rounded-lg border border-[#E8E1F7] bg-white p-3.5">
+                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F2EDFF] text-[#6D4BC3]">
+                    <Icon name="shield" className="h-4 w-4" />
+                </span>
+                <p className="mt-3 font-['Space_Grotesk'] text-[11px] font-semibold text-[#292B26]">
+                    01 · Escalation detected
+                </p>
+                <p className="mt-1 font-['Space_Grotesk'] text-[10px] leading-[17px] text-[#747878]">
+                    The prospect requests a person, or the request falls outside the agent&apos;s approved scope.
+                </p>
+            </div>
+            <div className="rounded-lg border border-[#E8E1F7] bg-white p-3.5">
+                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F2EDFF] text-[#6D4BC3]">
+                    <Icon name="database" className="h-4 w-4" />
+                </span>
+                <p className="mt-3 font-['Space_Grotesk'] text-[11px] font-semibold text-[#292B26]">
+                    02 · Context packaged
+                </p>
+                <p className="mt-1 font-['Space_Grotesk'] text-[10px] leading-[17px] text-[#747878]">
+                    The handoff summary includes the reason, transcript, captured answers and outstanding questions.
+                </p>
+            </div>
+            <div className="rounded-lg border border-[#E8E1F7] bg-white p-3.5">
+                <span className="flex h-8 w-8 items-center justify-center rounded-lg bg-[#F2EDFF] text-[#6D4BC3]">
+                    <Icon name="phone" className="h-4 w-4" />
+                </span>
+                <p className="mt-3 font-['Space_Grotesk'] text-[11px] font-semibold text-[#292B26]">
+                    03 · Team takes over
+                </p>
+                <p className="mt-1 font-['Space_Grotesk'] text-[10px] leading-[17px] text-[#747878]">
+                    The configured routing destination receives the context so the prospect does not need to repeat everything.
+                </p>
+            </div>
+        </div>
+
+        <div className="mt-4 rounded-lg border border-[#E8E1F7] bg-white p-4">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                    <p className="font-['Space_Grotesk'] text-[9px] font-semibold uppercase tracking-[0.7px] text-[#898D86]">
+                        Example handoff summary
+                    </p>
+                    <p className="mt-1 font-['Space_Grotesk'] text-[12px] font-semibold text-[#292B26]">
+                        Property enquiry · Human review requested
+                    </p>
+                </div>
+                <StatusPill tone="success">Context prepared</StatusPill>
+            </div>
+            <div className="mt-3 grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                <div>
+                    <p className="font-['Space_Grotesk'] text-[9px] uppercase tracking-[0.6px] text-[#898D86]">Handoff reason</p>
+                    <p className="mt-1 font-['Space_Grotesk'] text-[11px] font-medium text-[#454840]">Out-of-scope question</p>
+                </div>
+                <div>
+                    <p className="font-['Space_Grotesk'] text-[9px] uppercase tracking-[0.6px] text-[#898D86]">Captured need</p>
+                    <p className="mt-1 font-['Space_Grotesk'] text-[11px] font-medium text-[#454840]">2-bedroom apartment</p>
+                </div>
+                <div>
+                    <p className="font-['Space_Grotesk'] text-[9px] uppercase tracking-[0.6px] text-[#898D86]">Missing detail</p>
+                    <p className="mt-1 font-['Space_Grotesk'] text-[11px] font-medium text-[#454840]">Budget confirmation</p>
+                </div>
+                <div>
+                    <p className="font-['Space_Grotesk'] text-[9px] uppercase tracking-[0.6px] text-[#898D86]">Destination</p>
+                    <p className="mt-1 font-['Space_Grotesk'] text-[11px] font-medium text-[#454840]">Property sales team</p>
+                </div>
+            </div>
+            <p className="mt-3 border-t border-[#EEEAF5] pt-3 font-['Space_Grotesk'] text-[9px] leading-[16px] text-[#898D86]">
+                Demo only. No call is transferred and no team is notified by this frontend interaction.
+            </p>
+        </div>
+    </section>
+);
+
 const IntegrationFlow = () => (
     <section className="mt-6 rounded-xl border border-[#E9E8E1] bg-white p-5 md:p-6">
         <div className="max-w-[560px]">
@@ -562,6 +727,7 @@ const IntegrationFlow = () => (
 const DeterministicAgentPanel = () => {
     const [selectedStep, setSelectedStep] = useState<WorkflowStepId>("qualification");
     const [showGuardrailExample, setShowGuardrailExample] = useState(false);
+    const [activeAgentView, setActiveAgentView] = useState<"workflow" | "escalation">("workflow");
 
     return (
         <div className="mt-10 overflow-hidden rounded-xl border border-[#E9E8E1] bg-[#FCFBF8] shadow-[0px_8px_30px_rgba(0,0,0,0.06)]">
@@ -582,7 +748,7 @@ const DeterministicAgentPanel = () => {
             </div>
 
             <div className="p-5 md:p-7 lg:p-8">
-                {/* Agent introduction */}
+                {/* Agent introduction and glass tabs */}
                 <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
                     <div className="max-w-[650px]">
                         <p className="font-['Space_Grotesk'] text-[10px] font-semibold uppercase tracking-[1.2px] text-[#7852D6]">
@@ -595,64 +761,93 @@ const DeterministicAgentPanel = () => {
                             Configure the conversation, control which actions the agent can take, and route exceptions to your team with the context they need.
                         </p>
                     </div>
-                    <div className="flex shrink-0 flex-wrap gap-2">
-                        <StatusPill tone="purple">Rule-guided workflow</StatusPill>
-                        <StatusPill>Human escalation path</StatusPill>
-                    </div>
+
+                    <GlassTabs<"workflow" | "escalation">
+                        value={activeAgentView}
+                        onChange={setActiveAgentView}
+                        ariaLabel="Deterministic agent views"
+                        idPrefix="agent-view"
+                        className="w-full md:w-[390px] md:shrink-0"
+                        options={[
+                            { value: "workflow", label: "Rule-guided workflow" },
+                            { value: "escalation", label: "Human escalation path" },
+                        ]}
+                    />
                 </div>
 
-                {/* Capability strip */}
-                <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
-                    <div className="flex items-center gap-3 rounded-lg border border-[#E9E8E1] bg-white p-3.5">
-                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#F2F0E9] text-[#5C6058]">
-                            <Icon name="workflow" className="h-[18px] w-[18px]" />
-                        </span>
-                        <div>
-                            <p className="font-['Space_Grotesk'] text-[11px] font-semibold text-[#292B26]">Defined conversation paths</p>
-                            <p className="mt-0.5 font-['Space_Grotesk'] text-[10px] text-[#858984]">Explicit stages & conditions</p>
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-3 rounded-lg border border-[#E9E8E1] bg-white p-3.5">
-                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#F2F0E9] text-[#5C6058]">
-                            <Icon name="shield" className="h-[18px] w-[18px]" />
-                        </span>
-                        <div>
-                            <p className="font-['Space_Grotesk'] text-[11px] font-semibold text-[#292B26]">Guardrail contracts</p>
-                            <p className="mt-0.5 font-['Space_Grotesk'] text-[10px] text-[#858984]">Approved actions & knowledge</p>
-                        </div>
-                    </div>
-                    <div className="flex items-center gap-3 rounded-lg border border-[#E9E8E1] bg-white p-3.5">
-                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#F2F0E9] text-[#5C6058]">
-                            <Icon name="handoff" className="h-[18px] w-[18px]" />
-                        </span>
-                        <div>
-                            <p className="font-['Space_Grotesk'] text-[11px] font-semibold text-[#292B26]">Human handoff</p>
-                            <p className="mt-0.5 font-['Space_Grotesk'] text-[10px] text-[#858984]">Context-aware escalation</p>
-                        </div>
-                    </div>
-                </div>
+                {/* The selected tab owns its own content. Switching tabs never
+                    toggles an expandable panel or changes the other tab's state. */}
+                <div
+                    id="agent-view-panel"
+                    role="tabpanel"
+                    aria-labelledby={
+                        activeAgentView === "workflow"
+                            ? "agent-view-workflow-tab"
+                            : "agent-view-escalation-tab"
+                    }
+                    className="mt-6"
+                >
+                    {activeAgentView === "workflow" ? (
+                        <div key="workflow" className="foolioo-glass-panel">
+                            {/* Workflow capabilities */}
+                            <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+                                <div className="flex items-center gap-3 rounded-lg border border-[#E9E8E1] bg-white p-3.5">
+                                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#F2F0E9] text-[#5C6058]">
+                                        <Icon name="workflow" className="h-[18px] w-[18px]" />
+                                    </span>
+                                    <div>
+                                        <p className="font-['Space_Grotesk'] text-[11px] font-semibold text-[#292B26]">Defined conversation paths</p>
+                                        <p className="mt-0.5 font-['Space_Grotesk'] text-[10px] text-[#858984]">Explicit stages & conditions</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-3 rounded-lg border border-[#E9E8E1] bg-white p-3.5">
+                                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#F2F0E9] text-[#5C6058]">
+                                        <Icon name="shield" className="h-[18px] w-[18px]" />
+                                    </span>
+                                    <div>
+                                        <p className="font-['Space_Grotesk'] text-[11px] font-semibold text-[#292B26]">Guardrail contracts</p>
+                                        <p className="mt-0.5 font-['Space_Grotesk'] text-[10px] text-[#858984]">Approved actions & knowledge</p>
+                                    </div>
+                                </div>
+                                <div className="flex items-center gap-3 rounded-lg border border-[#E9E8E1] bg-white p-3.5">
+                                    <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#F2F0E9] text-[#5C6058]">
+                                        <Icon name="handoff" className="h-[18px] w-[18px]" />
+                                    </span>
+                                    <div>
+                                        <p className="font-['Space_Grotesk'] text-[11px] font-semibold text-[#292B26]">Human handoff</p>
+                                        <p className="mt-0.5 font-['Space_Grotesk'] text-[10px] text-[#858984]">Context-aware escalation</p>
+                                    </div>
+                                </div>
+                            </div>
 
-                {/* Main execution workspace */}
-                <div className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-12">
-                    <div className="xl:col-span-4">
-                        <WorkflowPanel
-                            selectedStep={selectedStep}
-                            onSelectStep={setSelectedStep}
-                        />
-                    </div>
+                            {/* Main execution workspace */}
+                            <div className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-12">
+                                <div className="xl:col-span-4">
+                                    <WorkflowPanel
+                                        selectedStep={selectedStep}
+                                        onSelectStep={setSelectedStep}
+                                    />
+                                </div>
 
-                    <div className="space-y-5 xl:col-span-8">
-                        <ConversationPanel
-                            showGuardrailExample={showGuardrailExample}
-                            onToggleGuardrail={() =>
-                                setShowGuardrailExample((current) => !current)
-                            }
-                        />
-                        <DecisionTracePanel
-                            selectedStep={selectedStep}
-                            showGuardrailExample={showGuardrailExample}
-                        />
-                    </div>
+                                <div className="space-y-5 xl:col-span-8">
+                                    <ConversationPanel
+                                        showGuardrailExample={showGuardrailExample}
+                                        onToggleGuardrail={() =>
+                                            setShowGuardrailExample((current) => !current)
+                                        }
+                                    />
+                                    <DecisionTracePanel
+                                        selectedStep={selectedStep}
+                                        showGuardrailExample={showGuardrailExample}
+                                    />
+                                </div>
+                            </div>
+                        </div>
+                    ) : (
+                        <div key="escalation" className="foolioo-glass-panel">
+                            <HumanEscalationPanel />
+                        </div>
+                    )}
                 </div>
 
                 <IntegrationFlow />
@@ -689,53 +884,34 @@ export const TwoProducts = () => {
                     </p>
                 </div>
 
-                {/* Product tabs */}
-                <div
-                    className="mt-8 flex items-center justify-center gap-2"
-                    role="tablist"
-                    aria-label="Foolioo products"
-                >
-                    <button
-                        type="button"
-                        role="tab"
-                        id="campaigns-tab"
-                        aria-selected={activeTab === "campaigns"}
-                        aria-controls="product-panel"
-                        onClick={() => setActiveTab("campaigns")}
-                        className={`flex h-10 items-center rounded-full px-5 font-['Space_Grotesk'] text-[12px] font-medium tracking-[0.2px] transition-all duration-200 ${
-                            activeTab === "campaigns"
-                                ? "bg-[#1B1C18] text-white shadow-sm"
-                                : "border border-[#E9E8E1] bg-white text-[#747878] hover:bg-[#F5F3EC]"
-                        }`}
-                    >
-                        Folio Campaigns
-                    </button>
-                    <button
-                        type="button"
-                        role="tab"
-                        id="agent-tab"
-                        aria-selected={activeTab === "agent"}
-                        aria-controls="product-panel"
-                        onClick={() => setActiveTab("agent")}
-                        className={`flex h-10 items-center rounded-full px-5 font-['Space_Grotesk'] text-[12px] font-medium tracking-[0.2px] transition-all duration-200 ${
-                            activeTab === "agent"
-                                ? "bg-[#1B1C18] text-white shadow-sm"
-                                : "border border-[#E9E8E1] bg-white text-[#747878] hover:bg-[#F5F3EC]"
-                        }`}
-                    >
-                        Deterministic Agent
-                    </button>
-                </div>
+                {/* Product tabs with the same animated glass treatment */}
+                <GlassTabs<"campaigns" | "agent">
+                    value={activeTab}
+                    onChange={setActiveTab}
+                    ariaLabel="Foolioo products"
+                    idPrefix="product"
+                    className="mx-auto mt-8 max-w-[430px]"
+                    options={[
+                        { value: "campaigns", label: "Folio Campaigns" },
+                        { value: "agent", label: "Deterministic Agent" },
+                    ]}
+                />
 
                 <div
                     id="product-panel"
                     role="tabpanel"
-                    aria-labelledby={activeTab === "agent" ? "agent-tab" : "campaigns-tab"}
+                    aria-labelledby={
+                        activeTab === "agent" ? "product-agent-tab" : "product-campaigns-tab"
+                    }
+                    className="mt-2"
                 >
                     {activeTab === "agent" ? (
-                        <DeterministicAgentPanel />
+                        <div key="agent-product" className="foolioo-glass-panel">
+                            <DeterministicAgentPanel />
+                        </div>
                     ) : (
                         /* Existing Campaigns dashboard */
+                        <div key="campaigns-product" className="foolioo-glass-panel">
                         <div className="mt-10 overflow-hidden rounded-xl border border-[#E9E8E1] bg-white shadow-[0px_8px_30px_rgba(0,0,0,0.06)]">
                             {/* Mac Browser Chrome */}
                             <div className="flex h-11 items-center justify-between border-b border-[#E9E8E1] bg-[#FAFAF8] px-4">
@@ -909,9 +1085,36 @@ export const TwoProducts = () => {
                                 </div>
                             </div>
                         </div>
+                        </div>
                     )}
                 </div>
             </div>
+            <style jsx global>{`
+                @keyframes foolioo-glass-panel-enter {
+                    from {
+                        opacity: 0;
+                        transform: translate3d(0, 10px, 0) scale(0.995);
+                        filter: blur(5px);
+                    }
+                    to {
+                        opacity: 1;
+                        transform: translate3d(0, 0, 0) scale(1);
+                        filter: blur(0);
+                    }
+                }
+
+                .foolioo-glass-panel {
+                    animation: foolioo-glass-panel-enter 440ms cubic-bezier(0.22, 1, 0.36, 1) both;
+                    transform-origin: top center;
+                    will-change: opacity, transform, filter;
+                }
+
+                @media (prefers-reduced-motion: reduce) {
+                    .foolioo-glass-panel {
+                        animation: none;
+                    }
+                }
+            `}</style>
         </section>
     );
 };
