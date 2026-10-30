@@ -1,225 +1,744 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ReactNode } from "react";
 import { ComingSoonButton } from "@/components/ui/ComingSoon";
 
-const AgentFeatureCard = ({
-    icon,
-    title,
-    description,
-    metric,
-}: {
-    icon: "shield" | "conversation" | "handoff";
+type WorkflowStepId =
+    | "greeting"
+    | "intent"
+    | "qualification"
+    | "routing"
+    | "outcome";
+
+type WorkflowStep = {
+    id: WorkflowStepId;
     title: string;
+    shortTitle: string;
     description: string;
-    metric: string;
-}) => (
-    <article className="flex min-h-[270px] flex-col rounded-lg border border-[#F0EFE8] bg-[#F6F5EF] p-6 md:p-7">
-        <div className="flex h-10 w-10 items-center justify-center rounded-sm bg-black text-white">
-            <svg
-                aria-hidden="true"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.8"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="h-5 w-5"
-            >
-                {icon === "shield" && (
-                    <>
-                        <path d="M12 3.2 19 6v5.2c0 4.4-2.8 7.6-7 9.6-4.2-2-7-5.2-7-9.6V6l7-2.8Z" />
-                        <path d="m9 11.8 2 2 4-4.2" />
-                    </>
-                )}
+    trigger: string;
+    action: string;
+    evidence: string;
+};
 
-                {icon === "conversation" && (
-                    <>
-                        <path d="M4 18.5v-1.2A4.3 4.3 0 0 1 8.3 13h2.4a4.3 4.3 0 0 1 4.3 4.3v1.2" />
-                        <circle cx="9.5" cy="7.5" r="3" />
-                        <path d="M17 8a3 3 0 0 1 0 5.8M18.5 5.5a6 6 0 0 1 0 10.8" />
-                    </>
-                )}
+const workflowSteps: WorkflowStep[] = [
+    {
+        id: "greeting",
+        title: "Opening & consent",
+        shortTitle: "Greeting",
+        description:
+            "The agent opens with the approved introduction and confirms that the prospect can continue the conversation.",
+        trigger: "Call connected",
+        action: "Deliver the approved opening and wait for confirmation.",
+        evidence: "Opening script · call state",
+    },
+    {
+        id: "intent",
+        title: "Intent detection",
+        shortTitle: "Intent detection",
+        description:
+            "The response is mapped to a supported intent before the conversation moves to the next step.",
+        trigger: "Prospect responds to the opening",
+        action: "Classify the enquiry and follow its configured path.",
+        evidence: "Intent rules · supported categories",
+    },
+    {
+        id: "qualification",
+        title: "Lead qualification",
+        shortTitle: "Qualification",
+        description:
+            "The agent collects the information required by the qualification flow and asks only for missing details.",
+        trigger: "A supported enquiry is identified",
+        action: "Ask for property type, purpose, location and budget as configured.",
+        evidence: "Qualification checklist · captured answers",
+    },
+    {
+        id: "routing",
+        title: "Decision & routing",
+        shortTitle: "Decision & routing",
+        description:
+            "The collected answers are checked against configured conditions to determine the permitted next action.",
+        trigger: "Required qualification fields are available",
+        action: "Continue, mark for follow-up, or route to a human representative.",
+        evidence: "Decision conditions · escalation policy",
+    },
+    {
+        id: "outcome",
+        title: "Outcome & handoff",
+        shortTitle: "Outcome",
+        description:
+            "The session ends with a structured outcome and the relevant conversation context for the next team or system.",
+        trigger: "The flow reaches a terminal state",
+        action: "Save the outcome and pass the summary to the connected workflow.",
+        evidence: "Session summary · outcome record",
+    },
+];
 
-                {icon === "handoff" && (
-                    <>
-                        <path d="M4 13v-1a8 8 0 0 1 16 0v1" />
-                        <path d="M4 13h2.5A2.5 2.5 0 0 1 9 15.5v1A2.5 2.5 0 0 1 6.5 19H6a2 2 0 0 1-2-2v-4Z" />
-                        <path d="M20 13h-2.5a2.5 2.5 0 0 0-2.5 2.5v1a2.5 2.5 0 0 0 2.5 2.5h.5a2 2 0 0 0 2-2v-4Z" />
-                        <path d="M15 6.5a4.5 4.5 0 0 1 4 4.5" />
-                    </>
-                )}
-            </svg>
-        </div>
+const Icon = ({
+    name,
+    className = "h-4 w-4",
+}: {
+    name: "shield" | "workflow" | "handoff" | "phone" | "database" | "check" | "arrow" | "spark";
+    className?: string;
+}) => {
+    const common = {
+        className,
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: "currentColor",
+        strokeWidth: 1.8,
+        strokeLinecap: "round" as const,
+        strokeLinejoin: "round" as const,
+        "aria-hidden": true as const,
+    };
 
-        <h3 className="mt-5 font-['Space_Grotesk'] text-[17px] font-semibold leading-6 text-[#1B1C18]">
-            {title}
-        </h3>
+    switch (name) {
+        case "shield":
+            return (
+                <svg {...common}>
+                    <path d="M12 3.2 19 6v5.2c0 4.4-2.8 7.6-7 9.6-4.2-2-7-5.2-7-9.6V6l7-2.8Z" />
+                    <path d="m9 11.8 2 2 4-4.2" />
+                </svg>
+            );
+        case "workflow":
+            return (
+                <svg {...common}>
+                    <rect x="8" y="3" width="8" height="5" rx="1" />
+                    <rect x="2.5" y="16" width="8" height="5" rx="1" />
+                    <rect x="13.5" y="16" width="8" height="5" rx="1" />
+                    <path d="M12 8v4M6.5 16v-2h11v2M17.5 14v-2" />
+                </svg>
+            );
+        case "handoff":
+            return (
+                <svg {...common}>
+                    <path d="M4 13v-1a8 8 0 0 1 16 0v1" />
+                    <path d="M4 13h2.5A2.5 2.5 0 0 1 9 15.5v1A2.5 2.5 0 0 1 6.5 19H6a2 2 0 0 1-2-2v-4Z" />
+                    <path d="M20 13h-2.5a2.5 2.5 0 0 0-2.5 2.5v1a2.5 2.5 0 0 0 2.5 2.5h.5a2 2 0 0 0 2-2v-4Z" />
+                    <path d="M15 6.5a4.5 4.5 0 0 1 4 4.5" />
+                </svg>
+            );
+        case "phone":
+            return (
+                <svg {...common}>
+                    <path d="M7 3.5h10a1.5 1.5 0 0 1 1.5 1.5v14a1.5 1.5 0 0 1-1.5 1.5H7A1.5 1.5 0 0 1 5.5 19V5A1.5 1.5 0 0 1 7 3.5Z" />
+                    <path d="M10 17.5h4" />
+                </svg>
+            );
+        case "database":
+            return (
+                <svg {...common}>
+                    <ellipse cx="12" cy="5" rx="8" ry="3" />
+                    <path d="M4 5v14c0 1.7 3.6 3 8 3s8-1.3 8-3V5M4 12c0 1.7 3.6 3 8 3s8-1.3 8-3" />
+                </svg>
+            );
+        case "check":
+            return (
+                <svg {...common}>
+                    <path d="m5 12 4 4L19 6" />
+                </svg>
+            );
+        case "arrow":
+            return (
+                <svg {...common}>
+                    <path d="M5 12h14M13 6l6 6-6 6" />
+                </svg>
+            );
+        case "spark":
+            return (
+                <svg {...common}>
+                    <path d="m12 3 1.5 6.5L20 11l-6.5 1.5L12 19l-1.5-6.5L4 11l6.5-1.5L12 3Z" />
+                    <path d="m19 16 .7 2.3L22 19l-2.3.7L19 22l-.7-2.3L16 19l2.3-.7L19 16Z" />
+                </svg>
+            );
+    }
+};
 
-        <p className="mt-3 font-['Space_Grotesk'] text-[14px] leading-[23px] text-[#747878]">
-            {description}
-        </p>
+const StatusPill = ({
+    children,
+    tone = "neutral",
+}: {
+    children: ReactNode;
+    tone?: "neutral" | "success" | "purple" | "warning";
+}) => {
+    const tones = {
+        neutral: "border-[#E9E8E1] bg-white text-[#747878]",
+        success: "border-[#CDEBDD] bg-[#EFFAF4] text-[#23835D]",
+        purple: "border-[#DDD6FE] bg-[#F5F3FF] text-[#6D4BC3]",
+        warning: "border-[#F2DEC0] bg-[#FFF8EC] text-[#9A651C]",
+    };
 
-        <p className="mt-auto pt-8 font-['Space_Grotesk'] text-[16px] font-bold uppercase leading-5 tracking-[-0.2px] text-[#7852D6]">
-            {metric}
-        </p>
-    </article>
-);
+    return (
+        <span
+            className={`inline-flex items-center rounded-full border px-2.5 py-1 font-['Space_Grotesk'] text-[10px] font-semibold tracking-[0.2px] ${tones[tone]}`}
+        >
+            {children}
+        </span>
+    );
+};
 
-// ---------------------------------------------
-// DETERMINISTIC AGENT TAB
-// ---------------------------------------------
+const WorkflowPanel = ({
+    selectedStep,
+    onSelectStep,
+}: {
+    selectedStep: WorkflowStepId;
+    onSelectStep: (step: WorkflowStepId) => void;
+}) => {
+    const selectedIndex = workflowSteps.findIndex((step) => step.id === selectedStep);
 
-const DeterministicAgentPanel = () => (
-    <div className="mt-10 overflow-hidden rounded-xl border border-[#E9E8E1] bg-white shadow-[0px_8px_30px_rgba(0,0,0,0.06)]">
-
-        {/* Agent Engine Header */}
-        <div className="flex min-h-11 flex-wrap items-center justify-between gap-2 bg-[#EAE9E2] px-5 py-3 md:px-7">
-            <div className="flex items-center gap-3">
-                <span className="h-3 w-3 shrink-0 rounded-full bg-[#2FC29B]" />
-
-                <span className="font-['Space_Grotesk'] text-[11px] font-semibold uppercase tracking-[0.55px] text-[#1B1C18]">
-                    FOLIO DETERMINISTIC VOICE ENGINE
+    return (
+        <section className="rounded-xl border border-[#E9E8E1] bg-white p-5 shadow-[0_2px_12px_rgba(28,29,24,0.03)] md:p-6">
+            <div className="flex items-start justify-between gap-3">
+                <div>
+                    <p className="font-['Space_Grotesk'] text-[10px] font-semibold uppercase tracking-[1.1px] text-[#858984]">
+                        Execution map
+                    </p>
+                    <h3 className="mt-1 font-['Space_Grotesk'] text-[16px] font-semibold text-[#1B1C18]">
+                        Conversation workflow
+                    </h3>
+                </div>
+                <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#F5F3EC] text-[#5B5E56]">
+                    <Icon name="workflow" className="h-[18px] w-[18px]" />
                 </span>
             </div>
 
-            <p className="font-['Space_Grotesk'] text-[11px] font-medium tracking-[0.1px] text-[#565A5A] md:text-[12px]">
-                Voice Stack: Ultra-low latency Neural SIP (280ms)
+            <div className="mt-5 space-y-1">
+                {workflowSteps.map((step, index) => {
+                    const isSelected = step.id === selectedStep;
+                    const isComplete = index < selectedIndex;
+                    const isCurrent = index === selectedIndex;
+
+                    return (
+                        <div key={step.id} className="relative">
+                            {index < workflowSteps.length - 1 && (
+                                <span className="absolute left-[15px] top-9 h-[calc(100%-4px)] w-px bg-[#E9E8E1]" />
+                            )}
+                            <button
+                                type="button"
+                                onClick={() => onSelectStep(step.id)}
+                                aria-pressed={isSelected}
+                                className={`relative flex w-full items-center gap-3 rounded-lg p-2.5 text-left transition-colors ${
+                                    isSelected
+                                        ? "bg-[#F5F3FF]"
+                                        : "hover:bg-[#FAF9F5]"
+                                }`}
+                            >
+                                <span
+                                    className={`z-10 flex h-[31px] w-[31px] shrink-0 items-center justify-center rounded-full border text-[11px] font-semibold ${
+                                        isComplete
+                                            ? "border-[#BFE8D3] bg-[#E9F8F0] text-[#23835D]"
+                                            : isCurrent
+                                              ? "border-[#CFC3F4] bg-[#EDE8FB] text-[#6D4BC3]"
+                                              : "border-[#E9E8E1] bg-white text-[#999D96]"
+                                    }`}
+                                >
+                                    {isComplete ? (
+                                        <Icon name="check" className="h-4 w-4" />
+                                    ) : (
+                                        String(index + 1).padStart(2, "0")
+                                    )}
+                                </span>
+
+                                <span className="min-w-0 flex-1">
+                                    <span className="block font-['Space_Grotesk'] text-[12px] font-semibold text-[#292B26]">
+                                        {step.shortTitle}
+                                    </span>
+                                    <span className="mt-0.5 block font-['Space_Grotesk'] text-[10px] text-[#898D86]">
+                                        {isComplete
+                                            ? "Completed in this example"
+                                            : isCurrent
+                                              ? "Selected step"
+                                              : "Next in workflow"}
+                                    </span>
+                                </span>
+
+                                <span
+                                    className={`shrink-0 rounded-full px-2 py-1 font-['Space_Grotesk'] text-[9px] font-semibold ${
+                                        isComplete
+                                            ? "bg-[#E9F8F0] text-[#23835D]"
+                                            : isCurrent
+                                              ? "bg-[#EDE8FB] text-[#6D4BC3]"
+                                              : "bg-[#F5F4EF] text-[#92968F]"
+                                    }`}
+                                >
+                                    {isComplete ? "DONE" : isCurrent ? "ACTIVE" : "QUEUED"}
+                                </span>
+                            </button>
+                        </div>
+                    );
+                })}
+            </div>
+
+            <div className="mt-4 rounded-lg border border-[#E9E8E1] bg-[#FBFAF6] p-3.5">
+                <p className="font-['Space_Grotesk'] text-[10px] font-semibold uppercase tracking-[0.8px] text-[#858984]">
+                    Selected stage
+                </p>
+                <p className="mt-1 font-['Space_Grotesk'] text-[12px] font-semibold text-[#1B1C18]">
+                    {workflowSteps[selectedIndex].title}
+                </p>
+                <p className="mt-1.5 font-['Space_Grotesk'] text-[11px] leading-[18px] text-[#747878]">
+                    {workflowSteps[selectedIndex].description}
+                </p>
+            </div>
+        </section>
+    );
+};
+
+const ConversationPanel = ({
+    showGuardrailExample,
+    onToggleGuardrail,
+}: {
+    showGuardrailExample: boolean;
+    onToggleGuardrail: () => void;
+}) => (
+    <section className="overflow-hidden rounded-xl border border-[#E9E8E1] bg-white shadow-[0_2px_12px_rgba(28,29,24,0.03)]">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#E9E8E1] px-5 py-4 md:px-6">
+            <div className="flex items-center gap-3">
+                <span className="flex h-9 w-9 items-center justify-center rounded-full bg-[#1B1C18] font-['Space_Grotesk'] text-[10px] font-bold text-white">
+                    AI
+                </span>
+                <div>
+                    <p className="font-['Space_Grotesk'] text-[13px] font-semibold text-[#1B1C18]">
+                        Lead qualification call
+                    </p>
+                    <p className="font-['Space_Grotesk'] text-[10px] text-[#898D86]">
+                        Sample conversation · Real-time transcript concept
+                    </p>
+                </div>
+            </div>
+            <div className="flex items-center gap-2">
+                <StatusPill tone="success">Demo session</StatusPill>
+                <StatusPill>Illustrative data</StatusPill>
+            </div>
+        </div>
+
+        <div className="space-y-4 bg-[#FCFBF8] p-5 md:p-6">
+            <div className="flex items-start gap-2.5">
+                <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#1B1C18] font-['Space_Grotesk'] text-[9px] font-bold text-white">
+                    AI
+                </span>
+                <div className="max-w-[88%] rounded-xl rounded-tl-sm border border-[#E9E8E1] bg-white p-3.5">
+                    <p className="font-['Space_Grotesk'] text-[9px] font-semibold uppercase tracking-[0.7px] text-[#898D86]">
+                        Agent · Opening script
+                    </p>
+                    <p className="mt-1.5 font-['Space_Grotesk'] text-[12px] leading-[20px] text-[#343630]">
+                        Hello, I&apos;m calling about your property enquiry. Is now a convenient time for a brief conversation?
+                    </p>
+                </div>
+            </div>
+
+            <div className="flex items-start justify-end gap-2.5">
+                <div className="max-w-[88%] rounded-xl rounded-tr-sm border border-[#E9E8E1] bg-[#F3F1EA] p-3.5">
+                    <p className="font-['Space_Grotesk'] text-[9px] font-semibold uppercase tracking-[0.7px] text-[#898D86]">
+                        Prospect · Response
+                    </p>
+                    <p className="mt-1.5 font-['Space_Grotesk'] text-[12px] leading-[20px] text-[#343630]">
+                        Yes. I&apos;m looking for a two-bedroom apartment for my family.
+                    </p>
+                </div>
+                <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#E9E8E1] font-['Space_Grotesk'] text-[9px] font-bold text-[#454840]">
+                    PM
+                </span>
+            </div>
+
+            <div className="flex items-start gap-2.5">
+                <span className="mt-0.5 flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#1B1C18] font-['Space_Grotesk'] text-[9px] font-bold text-white">
+                    AI
+                </span>
+                <div className="max-w-[88%] rounded-xl rounded-tl-sm border border-[#DDD6FE] bg-[#F7F5FF] p-3.5">
+                    <p className="font-['Space_Grotesk'] text-[9px] font-semibold uppercase tracking-[0.7px] text-[#7862B5]">
+                        Agent · Qualification path
+                    </p>
+                    <p className="mt-1.5 font-['Space_Grotesk'] text-[12px] leading-[20px] text-[#43386D]">
+                        Understood. Do you have a preferred location and approximate budget?
+                    </p>
+                </div>
+            </div>
+
+            {showGuardrailExample && (
+                <div className="rounded-xl border border-[#E9DCC5] bg-[#FFFCF5] p-4 md:p-5">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                        <div className="flex items-center gap-2">
+                            <span className="flex h-7 w-7 items-center justify-center rounded-md bg-[#F5EBD8] text-[#9A651C]">
+                                <Icon name="shield" className="h-4 w-4" />
+                            </span>
+                            <p className="font-['Space_Grotesk'] text-[11px] font-semibold text-[#4D402D]">
+                                Guardrail scenario
+                            </p>
+                        </div>
+                        <StatusPill tone="warning">Out-of-scope request</StatusPill>
+                    </div>
+
+                    <div className="mt-3 space-y-2.5">
+                        <div className="rounded-lg border border-[#EFE5D4] bg-white p-3">
+                            <p className="font-['Space_Grotesk'] text-[9px] font-semibold uppercase tracking-[0.7px] text-[#898D86]">
+                                Prospect asks
+                            </p>
+                            <p className="mt-1 font-['Space_Grotesk'] text-[12px] leading-[19px] text-[#343630]">
+                                Can you guarantee this property will appreciate by 30%?
+                            </p>
+                        </div>
+                        <div className="flex items-center gap-2 px-1 font-['Space_Grotesk'] text-[10px] font-semibold text-[#9A651C]">
+                            <Icon name="shield" className="h-3.5 w-3.5" />
+                            Policy check: unsupported financial guarantee
+                        </div>
+                        <div className="rounded-lg border border-[#DDD6FE] bg-[#F7F5FF] p-3">
+                            <p className="font-['Space_Grotesk'] text-[9px] font-semibold uppercase tracking-[0.7px] text-[#7862B5]">
+                                Approved response
+                            </p>
+                            <p className="mt-1 font-['Space_Grotesk'] text-[12px] leading-[19px] text-[#43386D]">
+                                I can&apos;t guarantee future property appreciation. I can arrange for a property consultant to discuss the market information with you.
+                            </p>
+                        </div>
+                        <div className="flex flex-wrap items-center justify-between gap-2 rounded-lg bg-[#F5F0E5] px-3 py-2.5">
+                            <span className="font-['Space_Grotesk'] text-[10px] font-medium text-[#6B5738]">
+                                Next action: offer a human handoff
+                            </span>
+                            <StatusPill tone="success">Escalation path selected</StatusPill>
+                        </div>
+                    </div>
+                </div>
+            )}
+
+            <div className="flex flex-wrap items-center justify-between gap-3 border-t border-[#E9E8E1] pt-4">
+                <div className="flex items-center gap-2 text-[#747878]">
+                    <span className="h-1.5 w-1.5 rounded-full bg-[#2CA879]" />
+                    <span className="font-['Space_Grotesk'] text-[10px]">
+                        Transcript shown with sample data
+                    </span>
+                </div>
+                <button
+                    type="button"
+                    onClick={onToggleGuardrail}
+                    aria-expanded={showGuardrailExample}
+                    className="inline-flex items-center gap-2 rounded-md border border-[#DCD5F0] bg-white px-3 py-2 font-['Space_Grotesk'] text-[10px] font-semibold text-[#6D4BC3] transition-colors hover:bg-[#F7F5FF]"
+                >
+                    <Icon name="shield" className="h-3.5 w-3.5" />
+                    {showGuardrailExample ? "Hide guardrail scenario" : "Explore guardrail scenario"}
+                </button>
+            </div>
+        </div>
+    </section>
+);
+
+const DecisionTracePanel = ({
+    selectedStep,
+    showGuardrailExample,
+}: {
+    selectedStep: WorkflowStepId;
+    showGuardrailExample: boolean;
+}) => {
+    const step = workflowSteps.find((item) => item.id === selectedStep) ?? workflowSteps[2];
+
+    return (
+        <section className="rounded-xl border border-[#E9E8E1] bg-white p-5 shadow-[0_2px_12px_rgba(28,29,24,0.03)] md:p-6">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+                <div>
+                    <p className="font-['Space_Grotesk'] text-[10px] font-semibold uppercase tracking-[1.1px] text-[#858984]">
+                        Explainable execution
+                    </p>
+                    <h3 className="mt-1 font-['Space_Grotesk'] text-[16px] font-semibold text-[#1B1C18]">
+                        Decision trace
+                    </h3>
+                </div>
+                <StatusPill tone="purple">Sample trace</StatusPill>
+            </div>
+
+            <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                <div className="rounded-lg bg-[#FBFAF6] p-3.5">
+                    <p className="font-['Space_Grotesk'] text-[9px] font-semibold uppercase tracking-[0.7px] text-[#898D86]">
+                        Current stage
+                    </p>
+                    <p className="mt-1.5 font-['Space_Grotesk'] text-[12px] font-semibold text-[#292B26]">
+                        {step.title}
+                    </p>
+                </div>
+                <div className="rounded-lg bg-[#FBFAF6] p-3.5">
+                    <p className="font-['Space_Grotesk'] text-[9px] font-semibold uppercase tracking-[0.7px] text-[#898D86]">
+                        Decision status
+                    </p>
+                    <p className="mt-1.5 font-['Space_Grotesk'] text-[12px] font-semibold text-[#292B26]">
+                        {showGuardrailExample ? "Guardrail matched" : "Awaiting next input"}
+                    </p>
+                </div>
+            </div>
+
+            <div className="mt-4 space-y-3">
+                <div>
+                    <p className="font-['Space_Grotesk'] text-[9px] font-semibold uppercase tracking-[0.7px] text-[#898D86]">
+                        Trigger
+                    </p>
+                    <p className="mt-1 font-['Space_Grotesk'] text-[11px] leading-[18px] text-[#454840]">
+                        {showGuardrailExample
+                            ? "A prospect requests a financial guarantee that is not supported by the approved knowledge base."
+                            : step.trigger}
+                    </p>
+                </div>
+                <div className="h-px bg-[#EEEDE7]" />
+                <div>
+                    <p className="font-['Space_Grotesk'] text-[9px] font-semibold uppercase tracking-[0.7px] text-[#898D86]">
+                        Permitted action
+                    </p>
+                    <p className="mt-1 font-['Space_Grotesk'] text-[11px] leading-[18px] text-[#454840]">
+                        {showGuardrailExample
+                            ? "Decline to make the unsupported claim and offer a handoff to a property consultant."
+                            : step.action}
+                    </p>
+                </div>
+                <div className="h-px bg-[#EEEDE7]" />
+                <div>
+                    <p className="font-['Space_Grotesk'] text-[9px] font-semibold uppercase tracking-[0.7px] text-[#898D86]">
+                        Referenced configuration
+                    </p>
+                    <p className="mt-1 font-['Space_Grotesk'] text-[11px] leading-[18px] text-[#454840]">
+                        {showGuardrailExample
+                            ? "Approved knowledge base · restricted claims policy · human escalation path"
+                            : step.evidence}
+                    </p>
+                </div>
+            </div>
+
+            <div className="mt-5 flex items-start gap-2.5 rounded-lg border border-[#DDD6FE] bg-[#F7F5FF] p-3.5">
+                <Icon name="shield" className="mt-0.5 h-4 w-4 shrink-0 text-[#6D4BC3]" />
+                <p className="font-['Space_Grotesk'] text-[10px] leading-[17px] text-[#5C4B8D]">
+                    The interface illustrates the intended decision flow. Actual trace events, policies and audit records should come from the agent runtime.
+                </p>
+            </div>
+        </section>
+    );
+};
+
+const IntegrationFlow = () => (
+    <section className="mt-6 rounded-xl border border-[#E9E8E1] bg-white p-5 md:p-6">
+        <div className="max-w-[560px]">
+            <p className="font-['Space_Grotesk'] text-[10px] font-semibold uppercase tracking-[1.1px] text-[#858984]">
+                One connected platform
+            </p>
+            <h3 className="mt-1 font-['Space_Grotesk'] text-[16px] font-semibold text-[#1B1C18]">
+                From campaign to completed outcome
+            </h3>
+            <p className="mt-1.5 font-['Space_Grotesk'] text-[11px] leading-[18px] text-[#747878]">
+                Campaigns initiate the outreach. The voice agent handles the configured conversation. Outcomes return to the workflow for follow-up.
             </p>
         </div>
 
-        {/* Feature Cards */}
-        <div className="grid grid-cols-1 gap-4 bg-white p-5 sm:p-6 lg:grid-cols-3 lg:gap-6 lg:p-8">
-
-            <AgentFeatureCard
-                icon="shield"
-                title="Strict Guardrail Contracts"
-                description="Unlike generic LLM wrappers, Folio voice agents are bound to explicit decision trees and knowledge bases. If a prospect asks an out-of-scope question, the agent never improvises."
-                metric="99.98% Policy Adherence"
-            />
-
-            <AgentFeatureCard
-                icon="conversation"
-                title="Natural Cadence & Turn-Taking"
-                description="Human-grade barge-in latency allows prospects to interrupt, ask for clarification, or pause without the robotic hesitation that damages caller trust."
-                metric={"< 300ms Audio Response"}
-            />
-
-            <AgentFeatureCard
-                icon="handoff"
-                title="Live Human Warm-Handoff"
-                description="At the exact moment empathy or negotiation requires human nuance, the call transfers smoothly with a 3-second context briefing to your team."
-                metric="Zero Dead-Air Transfers"
-            />
-
+        <div className="mt-5 grid grid-cols-1 items-stretch gap-2 md:grid-cols-[1fr_auto_1fr_auto_1fr] md:items-center md:gap-3">
+            <div className="flex items-center gap-3 rounded-lg bg-[#FBFAF6] p-3.5">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#EEECE4] text-[#575B53]">
+                    <Icon name="workflow" className="h-[18px] w-[18px]" />
+                </span>
+                <div>
+                    <p className="font-['Space_Grotesk'] text-[12px] font-semibold text-[#292B26]">Campaigns</p>
+                    <p className="font-['Space_Grotesk'] text-[10px] text-[#858984]">Audience & scheduling</p>
+                </div>
+            </div>
+            <span className="hidden text-[#A3A59F] md:block">
+                <Icon name="arrow" className="h-4 w-4" />
+            </span>
+            <div className="flex items-center gap-3 rounded-lg border border-[#DDD6FE] bg-[#F7F5FF] p-3.5">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#EAE4FA] text-[#6D4BC3]">
+                    <Icon name="phone" className="h-[18px] w-[18px]" />
+                </span>
+                <div>
+                    <p className="font-['Space_Grotesk'] text-[12px] font-semibold text-[#292B26]">Voice Agent</p>
+                    <p className="font-['Space_Grotesk'] text-[10px] text-[#7862B5]">Controlled execution</p>
+                </div>
+            </div>
+            <span className="hidden text-[#A3A59F] md:block">
+                <Icon name="arrow" className="h-4 w-4" />
+            </span>
+            <div className="flex items-center gap-3 rounded-lg bg-[#FBFAF6] p-3.5">
+                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#EEECE4] text-[#575B53]">
+                    <Icon name="database" className="h-[18px] w-[18px]" />
+                </span>
+                <div>
+                    <p className="font-['Space_Grotesk'] text-[12px] font-semibold text-[#292B26]">Outcomes</p>
+                    <p className="font-['Space_Grotesk'] text-[10px] text-[#858984]">Results & follow-up</p>
+                </div>
+            </div>
         </div>
-    </div>
+    </section>
 );
 
-// ---------------------------------------------
-// MAIN TWO PRODUCTS COMPONENT
-// ---------------------------------------------
+const DeterministicAgentPanel = () => {
+    const [selectedStep, setSelectedStep] = useState<WorkflowStepId>("qualification");
+    const [showGuardrailExample, setShowGuardrailExample] = useState(false);
+
+    return (
+        <div className="mt-10 overflow-hidden rounded-xl border border-[#E9E8E1] bg-[#FCFBF8] shadow-[0px_8px_30px_rgba(0,0,0,0.06)]">
+            {/* Product workspace bar */}
+            <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#E9E8E1] bg-[#EAE9E2] px-5 py-3 md:px-7">
+                <div className="flex items-center gap-2.5">
+                    <span className="h-2.5 w-2.5 rounded-full bg-[#2FC29B]" />
+                    <span className="font-['Space_Grotesk'] text-[10px] font-semibold uppercase tracking-[0.9px] text-[#292B26]">
+                        FOOLIOO DETERMINISTIC VOICE ENGINE
+                    </span>
+                </div>
+                <div className="flex flex-wrap items-center gap-2">
+                    <StatusPill tone="success">Demo environment</StatusPill>
+                    <span className="font-['Space_Grotesk'] text-[10px] text-[#666A62]">
+                        Sample data · No live call connected
+                    </span>
+                </div>
+            </div>
+
+            <div className="p-5 md:p-7 lg:p-8">
+                {/* Agent introduction */}
+                <div className="flex flex-col justify-between gap-5 md:flex-row md:items-end">
+                    <div className="max-w-[650px]">
+                        <p className="font-['Space_Grotesk'] text-[10px] font-semibold uppercase tracking-[1.2px] text-[#7852D6]">
+                            Deterministic voice execution
+                        </p>
+                        <h3 className="mt-2 font-['Newsreader'] text-[29px] font-normal leading-[1.12] tracking-[-0.5px] text-[#1B1C18] sm:text-[36px]">
+                            Every conversation follows a defined path.
+                        </h3>
+                        <p className="mt-3 max-w-[610px] font-['Space_Grotesk'] text-[12px] leading-[21px] text-[#747878] md:text-[13px]">
+                            Configure the conversation, control which actions the agent can take, and route exceptions to your team with the context they need.
+                        </p>
+                    </div>
+                    <div className="flex shrink-0 flex-wrap gap-2">
+                        <StatusPill tone="purple">Rule-guided workflow</StatusPill>
+                        <StatusPill>Human escalation path</StatusPill>
+                    </div>
+                </div>
+
+                {/* Capability strip */}
+                <div className="mt-6 grid grid-cols-1 gap-3 sm:grid-cols-3">
+                    <div className="flex items-center gap-3 rounded-lg border border-[#E9E8E1] bg-white p-3.5">
+                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#F2F0E9] text-[#5C6058]">
+                            <Icon name="workflow" className="h-[18px] w-[18px]" />
+                        </span>
+                        <div>
+                            <p className="font-['Space_Grotesk'] text-[11px] font-semibold text-[#292B26]">Defined conversation paths</p>
+                            <p className="mt-0.5 font-['Space_Grotesk'] text-[10px] text-[#858984]">Explicit stages & conditions</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-3 rounded-lg border border-[#E9E8E1] bg-white p-3.5">
+                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#F2F0E9] text-[#5C6058]">
+                            <Icon name="shield" className="h-[18px] w-[18px]" />
+                        </span>
+                        <div>
+                            <p className="font-['Space_Grotesk'] text-[11px] font-semibold text-[#292B26]">Guardrail contracts</p>
+                            <p className="mt-0.5 font-['Space_Grotesk'] text-[10px] text-[#858984]">Approved actions & knowledge</p>
+                        </div>
+                    </div>
+                    <div className="flex items-center gap-3 rounded-lg border border-[#E9E8E1] bg-white p-3.5">
+                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg bg-[#F2F0E9] text-[#5C6058]">
+                            <Icon name="handoff" className="h-[18px] w-[18px]" />
+                        </span>
+                        <div>
+                            <p className="font-['Space_Grotesk'] text-[11px] font-semibold text-[#292B26]">Human handoff</p>
+                            <p className="mt-0.5 font-['Space_Grotesk'] text-[10px] text-[#858984]">Context-aware escalation</p>
+                        </div>
+                    </div>
+                </div>
+
+                {/* Main execution workspace */}
+                <div className="mt-5 grid grid-cols-1 gap-5 xl:grid-cols-12">
+                    <div className="xl:col-span-4">
+                        <WorkflowPanel
+                            selectedStep={selectedStep}
+                            onSelectStep={setSelectedStep}
+                        />
+                    </div>
+
+                    <div className="space-y-5 xl:col-span-8">
+                        <ConversationPanel
+                            showGuardrailExample={showGuardrailExample}
+                            onToggleGuardrail={() =>
+                                setShowGuardrailExample((current) => !current)
+                            }
+                        />
+                        <DecisionTracePanel
+                            selectedStep={selectedStep}
+                            showGuardrailExample={showGuardrailExample}
+                        />
+                    </div>
+                </div>
+
+                <IntegrationFlow />
+
+                <p className="mt-4 text-center font-['Space_Grotesk'] text-[9px] leading-[16px] text-[#9A9D96]">
+                    Product walkthrough only. Workflow steps, transcript and decision events are illustrative until connected to the production agent runtime.
+                </p>
+            </div>
+        </div>
+    );
+};
 
 export const TwoProducts = () => {
     const [activeTab, setActiveTab] = useState<"campaigns" | "agent">("campaigns");
 
     return (
         <section className="w-full border-t border-[#E9E8E1] bg-[#FBF9F2] pt-20 pb-16 md:pt-28 md:pb-24">
-
             <div className="mx-auto w-full max-w-[1240px] px-6 md:px-10">
-
-                {/* Section Header */}
+                {/* Section header */}
                 <div className="flex flex-col items-center text-center">
-
                     <span className="font-['Space_Grotesk'] text-[11px] font-semibold uppercase tracking-[1.5px] text-[#747878]">
                         PRODUCT ARCHITECTURE
                     </span>
-
                     <h2 className="mt-4 max-w-[620px]">
                         <span className="block font-['Newsreader'] text-[36px] font-normal leading-[1.12] tracking-[-0.8px] text-[#1B1C18] sm:text-[46px] md:text-[52px]">
                             Two products, one seamless
                         </span>
-
                         <span className="block font-['Newsreader'] text-[36px] font-normal italic leading-[1.12] tracking-[-0.8px] text-[#1B1C18] sm:text-[46px] md:text-[52px]">
                             experience.
                         </span>
                     </h2>
-
                     <p className="mt-4 max-w-[540px] font-['Space_Grotesk'] text-[14px] font-normal leading-[22px] tracking-[0.1px] text-[#747878] md:text-[15px]">
-                        Foolioo blends high-volume campaign orchestration with deterministic voice agent workflows into a single reliable platform.
+                        Foolioo separates campaign orchestration from conversational execution, giving teams control over outreach and every voice interaction.
                     </p>
                 </div>
 
-                {/* ---------------------------------
-                    TAB SWITCHERS
-                ---------------------------------- */}
-
+                {/* Product tabs */}
                 <div
                     className="mt-8 flex items-center justify-center gap-2"
                     role="tablist"
-                    aria-label="Folio products"
+                    aria-label="Foolioo products"
                 >
-                    {/* Campaigns Tab */}
                     <button
                         type="button"
-                        id="campaigns-tab"
                         role="tab"
+                        id="campaigns-tab"
                         aria-selected={activeTab === "campaigns"}
                         aria-controls="product-panel"
                         onClick={() => setActiveTab("campaigns")}
-                        className={`flex h-9 items-center gap-2 rounded-full px-5 font-['Space_Grotesk'] text-[12px] font-medium tracking-[0.2px] transition-all duration-200 ${
+                        className={`flex h-10 items-center rounded-full px-5 font-['Space_Grotesk'] text-[12px] font-medium tracking-[0.2px] transition-all duration-200 ${
                             activeTab === "campaigns"
-                                ? "bg-[#1B1C18] text-white shadow-xs"
+                                ? "bg-[#1B1C18] text-white shadow-sm"
                                 : "border border-[#E9E8E1] bg-white text-[#747878] hover:bg-[#F5F3EC]"
                         }`}
                     >
-                        <span>Two Campaigns</span>
+                        Folio Campaigns
                     </button>
-
-                    {/* Deterministic Agent Tab */}
                     <button
                         type="button"
-                        id="agent-tab"
                         role="tab"
+                        id="agent-tab"
                         aria-selected={activeTab === "agent"}
                         aria-controls="product-panel"
                         onClick={() => setActiveTab("agent")}
-                        className={`flex h-9 items-center gap-2 rounded-full px-5 font-['Space_Grotesk'] text-[12px] font-medium tracking-[0.2px] transition-all duration-200 ${
+                        className={`flex h-10 items-center rounded-full px-5 font-['Space_Grotesk'] text-[12px] font-medium tracking-[0.2px] transition-all duration-200 ${
                             activeTab === "agent"
-                                ? "bg-[#1B1C18] text-white shadow-xs"
+                                ? "bg-[#1B1C18] text-white shadow-sm"
                                 : "border border-[#E9E8E1] bg-white text-[#747878] hover:bg-[#F5F3EC]"
                         }`}
                     >
-                        <span>Deterministic Agent</span>
+                        Deterministic Agent
                     </button>
                 </div>
-
-                {/* ---------------------------------
-                    DYNAMIC PRODUCT CONTENT
-                ---------------------------------- */}
 
                 <div
                     id="product-panel"
                     role="tabpanel"
                     aria-labelledby={activeTab === "agent" ? "agent-tab" : "campaigns-tab"}
-                    aria-live="polite"
                 >
                     {activeTab === "agent" ? (
-
-                        // Show Deterministic Agent UI
                         <DeterministicAgentPanel />
-
                     ) : (
-
-                        // ---------------------------------
-                        // ORIGINAL CAMPAIGNS DASHBOARD
-                        // ---------------------------------
-
+                        /* Existing Campaigns dashboard */
                         <div className="mt-10 overflow-hidden rounded-xl border border-[#E9E8E1] bg-white shadow-[0px_8px_30px_rgba(0,0,0,0.06)]">
-
                             {/* Mac Browser Chrome */}
                             <div className="flex h-11 items-center justify-between border-b border-[#E9E8E1] bg-[#FAFAF8] px-4">
-
                                 <div className="flex items-center gap-2">
                                     <span className="h-3 w-3 rounded-full bg-[#EF4444]/80" />
                                     <span className="h-3 w-3 rounded-full bg-[#F59E0B]/80" />
@@ -227,10 +746,7 @@ export const TwoProducts = () => {
                                 </div>
 
                                 <div className="flex h-7 items-center rounded-md border border-[#E9E8E1] bg-white px-3 font-['Space_Grotesk'] text-[11px] text-[#747878] shadow-2xs">
-                                    <span className="text-[#A1A1AA]">
-                                        https://
-                                    </span>
-
+                                    <span className="text-[#A1A1AA]">https://</span>
                                     <span className="font-medium text-[#1B1C18]">
                                         app.foolioo.ai/campaigns/q4-renewal-outreach
                                     </span>
@@ -238,122 +754,98 @@ export const TwoProducts = () => {
 
                                 <div className="flex items-center gap-1.5">
                                     <span className="h-2 w-2 rounded-full bg-[#22A06B]" />
-
                                     <span className="font-['Space_Grotesk'] text-[11px] font-medium text-[#22A06B]">
                                         Live Session
                                     </span>
                                 </div>
                             </div>
 
-                            {/* Window Inner Content */}
+                            {/* Campaign dashboard content */}
                             <div className="grid grid-cols-1 lg:grid-cols-12">
-
-                                {/* Left Column: 3 Metric Cards */}
                                 <div className="flex flex-col gap-4 border-b border-[#E9E8E1] bg-[#FCFBF8] p-6 lg:col-span-4 lg:border-b-0 lg:border-r">
-
-                                    {/* Card 1: Connection Rate */}
+                                    {/* Connection rate */}
                                     <div className="flex flex-col justify-between rounded-lg border border-[#E9E8E1] bg-white p-4 shadow-2xs">
-
                                         <div className="flex items-center justify-between">
                                             <span className="font-['Space_Grotesk'] text-[11px] font-semibold uppercase tracking-[0.6px] text-[#747878]">
                                                 CONNECTION RATE
                                             </span>
-
                                             <span className="rounded bg-[#E3FCEF] px-1.5 py-0.5 font-['Space_Grotesk'] text-[10px] font-semibold text-[#22A06B]">
                                                 +12.3%
                                             </span>
                                         </div>
-
                                         <div className="mt-2 flex items-baseline gap-2">
                                             <span className="font-['Space_Grotesk'] text-[32px] font-bold text-[#1B1C18]">
                                                 74.9%
                                             </span>
-
                                             <span className="font-['Space_Grotesk'] text-[11px] text-[#747878]">
                                                 vs industry avg 24%
                                             </span>
                                         </div>
-
                                         <div className="mt-3 h-1.5 w-full overflow-hidden rounded-full bg-[#F5F3EC]">
                                             <div className="h-full w-[74.9%] rounded-full bg-[#22A06B]" />
                                         </div>
                                     </div>
 
-                                    {/* Card 2: Total Minutes */}
+                                    {/* Connected minutes */}
                                     <div className="flex flex-col justify-between rounded-lg border border-[#E9E8E1] bg-white p-4 shadow-2xs">
-
                                         <div className="flex items-center justify-between">
                                             <span className="font-['Space_Grotesk'] text-[11px] font-semibold uppercase tracking-[0.6px] text-[#747878]">
                                                 CONNECTED MINUTES
                                             </span>
-
                                             <span className="font-['Space_Grotesk'] text-[10px] text-[#747878]">
                                                 Today
                                             </span>
                                         </div>
-
                                         <div className="mt-2 flex items-baseline gap-2">
                                             <span className="font-['Space_Grotesk'] text-[32px] font-bold text-[#1B1C18]">
                                                 525 min
                                             </span>
-
                                             <span className="font-['Space_Grotesk'] text-[11px] text-[#747878]">
                                                 (Avg: 3m 42s)
                                             </span>
                                         </div>
-
                                         <p className="mt-2 font-['Space_Grotesk'] text-[11px] text-[#747878]">
                                             142 completed outbound conversations
                                         </p>
                                     </div>
 
-                                    {/* Card 3: Cost per minute */}
+                                    {/* Effective cost */}
                                     <div className="flex flex-col justify-between rounded-lg border border-[#E9E8E1] bg-white p-4 shadow-2xs">
-
                                         <div className="flex items-center justify-between">
                                             <span className="font-['Space_Grotesk'] text-[11px] font-semibold uppercase tracking-[0.6px] text-[#747878]">
                                                 EFFECTIVE COST
                                             </span>
-
                                             <span className="rounded bg-[#E3FCEF] px-1.5 py-0.5 font-['Space_Grotesk'] text-[10px] font-semibold text-[#22A06B]">
                                                 Deterministic
                                             </span>
                                         </div>
-
                                         <div className="mt-2 flex items-baseline gap-2">
                                             <span className="font-['Space_Grotesk'] text-[32px] font-bold text-[#1B1C18]">
                                                 ₹0.07
                                             </span>
-
                                             <span className="font-['Space_Grotesk'] text-[11px] text-[#747878]">
                                                 / minute
                                             </span>
                                         </div>
-
                                         <p className="mt-2 font-['Space_Grotesk'] text-[11px] text-[#747878]">
                                             vs outsourced call center rep (₹18/min)
                                         </p>
                                     </div>
                                 </div>
 
-                                {/* Right Column: Live Conversation Transcript */}
+                                {/* Live conversation transcript */}
                                 <div className="flex flex-col justify-between p-6 lg:col-span-8">
-
-                                    {/* Call Header */}
                                     <div className="flex flex-wrap items-center justify-between gap-4 border-b border-[#E9E8E1] pb-4">
-
                                         <div className="flex items-center gap-3">
                                             <div className="flex h-9 w-9 items-center justify-center rounded-full bg-[#E9E8E1] font-['Space_Grotesk'] text-[12px] font-bold text-[#1B1C18]">
                                                 AM
                                             </div>
-
                                             <div>
                                                 <p className="font-['Space_Grotesk'] text-[13px] font-semibold text-[#1B1C18]">
-                                                    Ananya Mehta • VP Operations, Guild Real Estate
+                                                    Ananya Mehta · VP Operations, Guild Real Estate
                                                 </p>
-
                                                 <p className="font-['Space_Grotesk'] text-[11px] text-[#747878]">
-                                                    +91 98200 45192 • Mumbai, MH
+                                                    +91 98200 45192 · Mumbai, MH
                                                 </p>
                                             </div>
                                         </div>
@@ -362,24 +854,17 @@ export const TwoProducts = () => {
                                             <span className="rounded-full bg-[#EDE9FE] px-2.5 py-1 font-['Space_Grotesk'] text-[11px] font-semibold text-[#6D28D9]">
                                                 ACTIVE CALL (02:44)
                                             </span>
-
                                             <ComingSoonButton className="rounded-md border border-[#E9E8E1] bg-white px-2.5 py-1 font-['Space_Grotesk'] text-[11px] font-medium text-[#EF4444] hover:bg-[#FEE2E2]">
                                                 End Call
                                             </ComingSoonButton>
                                         </div>
                                     </div>
 
-                                    {/* Dialogue Messages */}
                                     <div className="my-6 flex flex-col gap-4">
-
-                                        {/* AI Message */}
                                         <div className="flex items-start gap-3">
                                             <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#1B1C18]">
-                                                <span className="font-['Space_Grotesk'] text-[10px] font-bold text-white">
-                                                    AI
-                                                </span>
+                                                <span className="font-['Space_Grotesk'] text-[10px] font-bold text-white">AI</span>
                                             </div>
-
                                             <div className="rounded-lg rounded-tl-none border border-[#E9E8E1] bg-[#F5F3EC] p-3.5 shadow-2xs">
                                                 <p className="font-['Space_Grotesk'] text-[13px] leading-[20px] text-[#1B1C18]">
                                                     &ldquo;Hello Ananya, thank you for taking the time to speak with Foolioo. I&apos;m following up on your team&apos;s inquiry regarding our automated outbound dialer and deterministic voice agent. Is now still a good time for a quick 3-minute discussion?&rdquo;
@@ -387,29 +872,21 @@ export const TwoProducts = () => {
                                             </div>
                                         </div>
 
-                                        {/* User Response */}
                                         <div className="flex items-start justify-end gap-3">
                                             <div className="max-w-[85%] rounded-lg rounded-tr-none border border-[#E9E8E1] bg-white p-3.5 shadow-2xs">
                                                 <p className="font-['Space_Grotesk'] text-[13px] leading-[20px] text-[#1B1C18]">
                                                     &ldquo;Hey Aarav. Yeah, I have a few minutes. We&apos;re currently handling about 1,800 inquiries manually and we&apos;re looking to automate the qualification step.&rdquo;
                                                 </p>
                                             </div>
-
                                             <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#E9E8E1]">
-                                                <span className="font-['Space_Grotesk'] text-[10px] font-bold text-[#1B1C18]">
-                                                    AM
-                                                </span>
+                                                <span className="font-['Space_Grotesk'] text-[10px] font-bold text-[#1B1C18]">AM</span>
                                             </div>
                                         </div>
 
-                                        {/* AI Message */}
                                         <div className="flex items-start gap-3">
                                             <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full bg-[#1B1C18]">
-                                                <span className="font-['Space_Grotesk'] text-[10px] font-bold text-white">
-                                                    AI
-                                                </span>
+                                                <span className="font-['Space_Grotesk'] text-[10px] font-bold text-white">AI</span>
                                             </div>
-
                                             <div className="rounded-lg rounded-tl-none border border-[#DDD6FE] bg-[#F5F3FF] p-3.5 shadow-2xs">
                                                 <p className="font-['Space_Grotesk'] text-[13px] leading-[20px] text-[#4338CA]">
                                                     &ldquo;That&apos;s exactly what we specialize in. Foolioo can qualify those 1,800 prospective tenants in under two hours with strict adherence to your compliance script and zero hallucinations. Would you like me to trigger an automated demo run to your phone right now?&rdquo;
@@ -418,19 +895,13 @@ export const TwoProducts = () => {
                                         </div>
                                     </div>
 
-                                    {/* Guardrail Footer Bar */}
                                     <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-[#E9E8E1] bg-[#FBF9F2] p-3">
-
                                         <div className="flex items-center gap-2">
-                                            <span className="text-[14px]">
-                                                ⚡️
-                                            </span>
-
+                                            <span className="text-[14px]">⚡</span>
                                             <span className="font-['Space_Grotesk'] text-[12px] font-medium text-[#1B1C18]">
                                                 Guardrail active: Compliance disclosure delivered and acknowledged.
                                             </span>
                                         </div>
-
                                         <ComingSoonButton className="rounded bg-[#1B1C18] px-3 py-1 font-['Space_Grotesk'] text-[11px] font-medium text-white hover:bg-[#3A3B37]">
                                             Inspect Telemetry
                                         </ComingSoonButton>
