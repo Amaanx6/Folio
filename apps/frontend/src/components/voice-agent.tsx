@@ -1,4 +1,5 @@
 import { ComingSoonButton } from "@/components/ui/ComingSoon";
+import { AuthRedirectButton } from "@/components/ui/AuthRedirectButton";
 
 export const VoiceAgent = () => {
     return (
@@ -126,10 +127,10 @@ export const VoiceAgent = () => {
                         </div>
 
                         <div className="mt-8">
-                            <ComingSoonButton className="inline-flex items-center gap-1.5 font-['Space_Grotesk'] text-[13px] font-semibold text-[#1B1C18] transition hover:gap-2.5">
+                            <AuthRedirectButton className="inline-flex items-center gap-1.5 font-['Space_Grotesk'] text-[13px] font-semibold text-[#1B1C18] transition hover:gap-2.5">
                                 <span>Build an AI agent today</span>
                                 <span>→</span>
-                            </ComingSoonButton>
+                            </AuthRedirectButton>
                         </div>
                     </div>
                 </div>
