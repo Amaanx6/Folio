@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, type ReactNode } from "react";
-import { ComingSoonButton } from "@/components/ui/ComingSoon";
+
 
 type WorkflowStepId =
     | "greeting"
@@ -1030,9 +1030,9 @@ export const TwoProducts = () => {
                                             <span className="rounded-full bg-[#EDE9FE] px-2.5 py-1 font-['Space_Grotesk'] text-[11px] font-semibold text-[#6D28D9]">
                                                 ACTIVE CALL (02:44)
                                             </span>
-                                            <ComingSoonButton className="rounded-md border border-[#E9E8E1] bg-white px-2.5 py-1 font-['Space_Grotesk'] text-[11px] font-medium text-[#EF4444] hover:bg-[#FEE2E2]">
+                                            <button className="rounded-md border border-[#E9E8E1] bg-white px-2.5 py-1 font-['Space_Grotesk'] text-[11px] font-medium text-[#EF4444] hover:bg-[#FEE2E2]">
                                                 End Call
-                                            </ComingSoonButton>
+                                            </button>
                                         </div>
                                     </div>
 
@@ -1078,9 +1078,9 @@ export const TwoProducts = () => {
                                                 Guardrail active: Compliance disclosure delivered and acknowledged.
                                             </span>
                                         </div>
-                                        <ComingSoonButton className="rounded bg-[#1B1C18] px-3 py-1 font-['Space_Grotesk'] text-[11px] font-medium text-white hover:bg-[#3A3B37]">
+                                        <button className="rounded bg-[#1B1C18] px-3 py-1 font-['Space_Grotesk'] text-[11px] font-medium text-white hover:bg-[#3A3B37]">
                                             Inspect Telemetry
-                                        </ComingSoonButton>
+                                        </button>
                                     </div>
                                 </div>
                             </div>
