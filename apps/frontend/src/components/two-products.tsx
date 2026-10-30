@@ -257,7 +257,7 @@ const WorkflowPanel = ({
     const selectedIndex = workflowSteps.findIndex((step) => step.id === selectedStep);
 
     return (
-        <section className="rounded-xl border border-[#E9E8E1] bg-white p-5 shadow-[0_2px_12px_rgba(28,29,24,0.03)] md:p-6">
+        <section id="products" className="rounded-xl border border-[#E9E8E1] bg-white p-5 shadow-[0_2px_12px_rgba(28,29,24,0.03)] md:p-6">
             <div className="flex items-start justify-between gap-3">
                 <div>
                     <p className="font-['Space_Grotesk'] text-[10px] font-semibold uppercase tracking-[1.1px] text-[#858984]">

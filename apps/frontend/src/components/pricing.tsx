@@ -63,7 +63,7 @@ export const Pricing = () => {
     ];
 
     return (
-        <section className="w-full border-t border-[#E9E8E1] bg-[#FBF9F2] py-20 md:py-28">
+        <section id="pricing" className="w-full border-t border-[#E9E8E1] bg-[#FBF9F2] py-20 md:py-28">
             <div className="mx-auto w-full max-w-[1240px] px-6 md:px-10">
 
                 {/* Header */}
