@@ -12,6 +12,7 @@ import { getLivenessRoute, getReadinessRoute } from "./health.js";
 import { getAnalyticsOverviewRoute } from "./analytics.js";
 import { syncAuthUserRoute, getAuthMeRoute, updateAuthPhoneRoute } from "./auth.js";
 import { getBusinessProfileRoute, upsertBusinessProfileRoute } from "./businessProfile.js";
+import { getOnboardingRoute, saveOnboardingRoute } from "./onboarding.js";
 import { getCallsRoute, getCallByIdRoute, callCompleteRoute } from "./calls.js";
 import { getCampaignsRoute, getCampaignByIdRoute, createCampaignRoute, updateCampaignRoute, deleteCampaignRoute } from "./campaigns.js";
 import { getClientByIdRoute, getClientsRoute, updateClientRoute } from "./clients.js";
@@ -47,6 +48,10 @@ export function registerRoutes(app: Express) {
 
   // All other API routes require a provisioned user and are scoped to that user's workspace.
   api.use(requireAuth, requireWorkspace);
+
+  // New-user setup is scoped to the authenticated workspace.
+  api.get("/onboarding", getOnboardingRoute);
+  api.put("/onboarding", requireClientAdmin, saveOnboardingRoute);
 
   api.get("/analytics/overview", getAnalyticsOverviewRoute);
 
