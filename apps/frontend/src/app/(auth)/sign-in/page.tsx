@@ -1,14 +1,35 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState, type KeyboardEvent } from "react";
 import Link from "next/link";
 import { signInAction } from "../actions";
 import { GoogleButton } from "@/components/auth/google-button";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
+function VisibilityIcon({ visible }: { visible: boolean }) {
+  return visible ? (
+    <svg viewBox="0 0 20 20" className="h-[17px] w-[17px]" fill="none" aria-hidden="true">
+      <path d="M2.1 10s2.7-5 7.9-5 7.9 5 7.9 5-2.7 5-7.9 5-7.9-5-7.9-5Z" stroke="currentColor" strokeWidth="1.35" />
+      <circle cx="10" cy="10" r="2.2" stroke="currentColor" strokeWidth="1.35" />
+    </svg>
+  ) : (
+    <svg viewBox="0 0 20 20" className="h-[17px] w-[17px]" fill="none" aria-hidden="true">
+      <path d="M2.1 10s2.7-5 7.9-5 7.9 5 7.9 5-2.7 5-7.9 5-7.9-5-7.9-5Z" stroke="currentColor" strokeWidth="1.35" />
+      <circle cx="10" cy="10" r="2.2" stroke="currentColor" strokeWidth="1.35" />
+      <path d="m3 3 14 14" stroke="currentColor" strokeWidth="1.45" strokeLinecap="round" />
+    </svg>
+  );
+}
+
 export default function SignInPage() {
   const [state, formAction, isPending] = useActionState(signInAction, null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [capsLockOn, setCapsLockOn] = useState(false);
+
+  const handlePasswordKey = (event: KeyboardEvent<HTMLDivElement>) => {
+    setCapsLockOn(event.getModifierState("CapsLock"));
+  };
 
   return (
     <main className="mx-auto w-full max-w-[384px]">
@@ -56,20 +77,48 @@ export default function SignInPage() {
           type="email"
           label="Work email"
           placeholder="you@company.com"
+          autoComplete="email"
           error={state?.fieldErrors?.email?.[0]}
           required
         />
+
         <div className="flex flex-col gap-2">
-          <Input
-            id="password"
-            name="password"
-            type="password"
-            label="Password"
-            placeholder="Enter your password"
-            error={state?.fieldErrors?.password?.[0]}
-            required
-          />
-          <div className="-mt-0.5 flex justify-end">
+          <div className="relative" onKeyUp={handlePasswordKey} onKeyDown={handlePasswordKey}>
+            <Input
+              id="password"
+              name="password"
+              type={showPassword ? "text" : "password"}
+              label="Password"
+              placeholder="Enter your password"
+              autoComplete="current-password"
+              error={state?.fieldErrors?.password?.[0]}
+              required
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((current) => !current)}
+              aria-label={showPassword ? "Hide password" : "Show password"}
+              aria-pressed={showPassword}
+              className="absolute right-2 top-[36px] inline-flex h-8 w-8 items-center justify-center rounded-md text-[#85877F] transition-colors hover:bg-[#F2F0EA] hover:text-[#51496A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#A995D7]"
+            >
+              <VisibilityIcon visible={showPassword} />
+            </button>
+          </div>
+          {capsLockOn && (
+            <p role="status" className="-mt-1 font-['Space_Grotesk'] text-[11px] text-[#9A6700]">
+              Caps Lock is on.
+            </p>
+          )}
+          <div className="-mt-0.5 flex items-center justify-between gap-3">
+            <label className="inline-flex cursor-pointer items-center gap-2 font-['Space_Grotesk'] text-[11px] text-[#747878]">
+              <input
+                type="checkbox"
+                name="rememberMe"
+                value="true"
+                className="h-3.5 w-3.5 rounded border-[#D8D6CE] accent-[#7852D6] focus-visible:ring-2 focus-visible:ring-[#A995D7]"
+              />
+              Remember me
+            </label>
             <Link
               href="/forgot-password"
               className="font-['Space_Grotesk'] text-[11px] font-medium text-[#747878] underline decoration-transparent underline-offset-4 transition-colors hover:text-[#7852D6] hover:decoration-[#7852D6]"
@@ -90,7 +139,7 @@ export default function SignInPage() {
 
         <div className="pt-1">
           <Button type="submit" loading={isPending}>
-            Sign in
+            {isPending ? "Signing in…" : "Sign in"}
           </Button>
         </div>
       </form>

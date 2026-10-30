@@ -1,14 +1,47 @@
 "use client";
 
-import { useActionState } from "react";
+import { useActionState, useState } from "react";
 import Link from "next/link";
 import { signUpAction } from "../actions";
 import { GoogleButton } from "@/components/auth/google-button";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 
+function VisibilityIcon({ visible }: { visible: boolean }) {
+  return visible ? (
+    <svg viewBox="0 0 20 20" className="h-[17px] w-[17px]" fill="none" aria-hidden="true">
+      <path d="M2.1 10s2.7-5 7.9-5 7.9 5 7.9 5-2.7 5-7.9 5-7.9-5-7.9-5Z" stroke="currentColor" strokeWidth="1.35" />
+      <circle cx="10" cy="10" r="2.2" stroke="currentColor" strokeWidth="1.35" />
+    </svg>
+  ) : (
+    <svg viewBox="0 0 20 20" className="h-[17px] w-[17px]" fill="none" aria-hidden="true">
+      <path d="M2.1 10s2.7-5 7.9-5 7.9 5 7.9 5-2.7 5-7.9 5-7.9-5-7.9-5Z" stroke="currentColor" strokeWidth="1.35" />
+      <circle cx="10" cy="10" r="2.2" stroke="currentColor" strokeWidth="1.35" />
+      <path d="m3 3 14 14" stroke="currentColor" strokeWidth="1.45" strokeLinecap="round" />
+    </svg>
+  );
+}
+
+function getPasswordStrength(password: string) {
+  if (!password) return { score: 0, label: "Password strength", color: "#D9D7CF" };
+
+  const checks = [
+    password.length >= 8,
+    /[A-Za-z]/.test(password) && /\d/.test(password),
+    password.length >= 12,
+    /[a-z]/.test(password) && /[A-Z]/.test(password) && /[^A-Za-z0-9]/.test(password),
+  ];
+  const score = checks.filter(Boolean).length;
+  const labels = ["Too short", "Weak", "Fair", "Good", "Strong"];
+  const colors = ["#D9D7CF", "#D97757", "#D19A45", "#7D9A68", "#39855D"];
+  return { score, label: labels[score], color: colors[score] };
+}
+
 export default function SignUpPage() {
   const [state, formAction, isPending] = useActionState(signUpAction, null);
+  const [showPassword, setShowPassword] = useState(false);
+  const [password, setPassword] = useState("");
+  const strength = getPasswordStrength(password);
 
   return (
     <main className="mx-auto w-full max-w-[384px]">
@@ -67,34 +100,79 @@ export default function SignUpPage() {
           {state.success}
         </div>
       ) : (
-        <form action={formAction} className="mt-6 flex flex-col gap-[18px]">
+        <form action={formAction} className="mt-6 flex flex-col gap-[17px]">
           <Input
+            id="name"
             name="name"
             label="Full name"
             placeholder="Aarav Sharma"
+            autoComplete="name"
+            maxLength={50}
             error={state?.fieldErrors?.name?.[0]}
             required
           />
           <Input
+            id="email"
             name="email"
             type="email"
             label="Work email"
             placeholder="you@company.com"
+            autoComplete="email"
             error={state?.fieldErrors?.email?.[0]}
             required
           />
+
           <div className="flex flex-col gap-2">
-            <Input
-              name="password"
-              type="password"
-              label="Password"
-              placeholder="At least 8 characters"
-              error={state?.fieldErrors?.password?.[0]}
-              required
-            />
-            <p className="-mt-0.5 font-['Space_Grotesk'] text-[11px] leading-4 text-[#92938D]">
-              Use at least 8 characters. You can configure your workspace after creating your account.
-            </p>
+            <div className="relative">
+              <Input
+                id="password"
+                name="password"
+                type={showPassword ? "text" : "password"}
+                label="Password"
+                placeholder="At least 8 characters"
+                autoComplete="new-password"
+                minLength={8}
+                value={password}
+                onChange={(event) => setPassword(event.target.value)}
+                error={state?.fieldErrors?.password?.[0]}
+                required
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword((current) => !current)}
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                aria-pressed={showPassword}
+                className="absolute right-2 top-[36px] inline-flex h-8 w-8 items-center justify-center rounded-md text-[#85877F] transition-colors hover:bg-[#F2F0EA] hover:text-[#51496A] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#A995D7]"
+              >
+                <VisibilityIcon visible={showPassword} />
+              </button>
+            </div>
+
+            <div className="rounded-lg border border-[#ECE9E1] bg-[#FCFBF8] px-3 py-2.5">
+              <div className="flex items-center justify-between gap-3">
+                <span className="font-['Space_Grotesk'] text-[10px] font-medium text-[#777970]">Password strength</span>
+                <span className="font-['Space_Grotesk'] text-[10px] font-semibold" style={{ color: strength.color }} aria-live="polite">
+                  {strength.label}
+                </span>
+              </div>
+              <div className="mt-2 grid grid-cols-4 gap-1.5" aria-label={`Password strength: ${strength.label}`}>
+                {[0, 1, 2, 3].map((index) => (
+                  <span
+                    key={index}
+                    className="h-1 rounded-full transition-colors duration-300"
+                    style={{ backgroundColor: index < strength.score ? strength.color : "#E7E5DE" }}
+                  />
+                ))}
+              </div>
+              <div className="mt-2 flex flex-wrap gap-x-3 gap-y-1 font-['Space_Grotesk'] text-[10px] text-[#85877F]">
+                <span className={password.length >= 8 ? "text-[#39855D]" : ""}>
+                  {password.length >= 8 ? "✓" : "○"} 8 characters minimum
+                </span>
+                <span className={/[A-Za-z]/.test(password) && /\d/.test(password) ? "text-[#39855D]" : ""}>
+                  {/[A-Za-z]/.test(password) && /\d/.test(password) ? "✓" : "○"} Mix letters and numbers
+                </span>
+              </div>
+            </div>
           </div>
 
           {state?.error && (
@@ -108,9 +186,20 @@ export default function SignUpPage() {
 
           <div className="pt-1">
             <Button type="submit" loading={isPending}>
-              Create account
+              {isPending ? "Creating your account…" : "Create account"}
             </Button>
           </div>
+
+          <p className="-mt-1 text-center font-['Space_Grotesk'] text-[10px] leading-[17px] text-[#85877F]">
+            By creating an account, you agree to our{" "}
+            <Link href="/terms" className="font-medium text-[#51496A] underline underline-offset-2 hover:text-[#7852D6]">
+              Terms of Service
+            </Link>{" "}
+            and{" "}
+            <Link href="/privacy" className="font-medium text-[#51496A] underline underline-offset-2 hover:text-[#7852D6]">
+              Privacy Policy
+            </Link>.
+          </p>
         </form>
       )}
 
