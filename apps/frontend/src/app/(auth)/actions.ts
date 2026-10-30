@@ -6,8 +6,9 @@ import { redirect } from "next/navigation";
 import { headers } from "next/headers";
 import { Ratelimit } from "@upstash/ratelimit";
 import { Redis } from "@upstash/redis";
+import { resolvePostAuthDestination } from "@/lib/auth/backend";
 
-// Initialize Upstash Rate Limiter (5 requests per minute per IP)
+// Keep the existing server-side rate limit. Credentials remain outside browser code.
 const ratelimit = new Ratelimit({
   redis: Redis.fromEnv(),
   limiter: Ratelimit.slidingWindow(5, "1 m"),
@@ -19,125 +20,129 @@ export type AuthState = {
   success?: string;
 } | null;
 
-export async function signInAction(prevState: AuthState, formData: FormData): Promise<AuthState> {
-  // 1. Rate Limiting
-  const ip = (await headers()).get("x-forwarded-for") ?? "127.0.0.1";
-  const { success } = await ratelimit.limit(`signin_${ip}`);
-  if (!success) {
-    return { error: "Too many login attempts. Please try again in a minute." };
+async function rateLimit(key: string, message: string): Promise<AuthState> {
+  const ip = (await headers()).get("x-forwarded-for")?.split(",")[0]?.trim() ?? "127.0.0.1";
+  const { success } = await ratelimit.limit(`${key}_${ip}`);
+  return success ? null : { error: message };
+}
+
+async function destinationOrError(accessToken: string): Promise<{ destination?: "/onboarding" | "/dashboard"; error?: string }> {
+  try {
+    return { destination: await resolvePostAuthDestination(accessToken) };
+  } catch (error) {
+    console.error("[auth] Could not prepare Foolioo workspace:", error);
+    return { error: "Your account is authenticated, but we couldn't load your workspace. Please try signing in again." };
   }
+}
 
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
+export async function signInAction(prevState: AuthState, formData: FormData): Promise<AuthState> {
+  const limited = await rateLimit("signin", "Too many login attempts. Please try again in a minute.");
+  if (limited) return limited;
 
-  // 2. Validate
-  const validated = signInSchema.safeParse({ email, password });
+  const validated = signInSchema.safeParse({
+    email: formData.get("email"),
+    password: formData.get("password"),
+  });
   if (!validated.success) {
     return { fieldErrors: validated.error.flatten().fieldErrors };
   }
 
-  // 3. Authenticate
   const supabase = await createClient();
-  const { error } = await supabase.auth.signInWithPassword({
+  const { data, error } = await supabase.auth.signInWithPassword({
     email: validated.data.email,
     password: validated.data.password,
   });
 
-  if (error) {
-    // Return generic error to prevent email enumeration
+  if (error || !data.session?.access_token) {
     return { error: "Invalid email or password." };
   }
 
-  redirect("/dashboard");
+  const result = await destinationOrError(data.session.access_token);
+  if (result.error || !result.destination) return { error: result.error ?? "Unable to load your workspace." };
+  redirect(result.destination);
 }
 
 export async function signUpAction(prevState: AuthState, formData: FormData): Promise<AuthState> {
-  // 1. Rate Limiting
-  const ip = (await headers()).get("x-forwarded-for") ?? "127.0.0.1";
-  const { success } = await ratelimit.limit(`signup_${ip}`);
-  if (!success) {
-    return { error: "Too many sign-up attempts. Please try again in a minute." };
-  }
+  const limited = await rateLimit("signup", "Too many sign-up attempts. Please try again in a minute.");
+  if (limited) return limited;
 
-  const name = formData.get("name") as string;
-  const email = formData.get("email") as string;
-  const password = formData.get("password") as string;
-
-  // 2. Validate
-  const validated = signUpSchema.safeParse({ name, email, password });
+  const validated = signUpSchema.safeParse({
+    name: formData.get("name"),
+    email: formData.get("email"),
+    password: formData.get("password"),
+  });
   if (!validated.success) {
     return { fieldErrors: validated.error.flatten().fieldErrors };
   }
 
-  // 3. Create User
   const supabase = await createClient();
+  const requestHeaders = await headers();
+  const origin = requestHeaders.get("origin") || process.env.NEXT_PUBLIC_SITE_URL;
+
   const { data, error } = await supabase.auth.signUp({
     email: validated.data.email,
     password: validated.data.password,
     options: {
-      data: {
-        full_name: validated.data.name,
-      },
+      data: { full_name: validated.data.name },
+      ...(origin ? { emailRedirectTo: `${origin.replace(/\/$/, "")}/auth/callback` } : {}),
     },
   });
 
   if (error) {
-    // SECURITY FIX: Log the real error server-side, but don't leak it to the client
     console.error("Supabase Signup Error:", error.message);
-    
-    if (error.message.toLowerCase().includes("already registered") || error.message.toLowerCase().includes("already exists")) {
+    const message = error.message.toLowerCase();
+    if (message.includes("already registered") || message.includes("already exists")) {
       return { error: "An account with this email already exists." };
     }
     return { error: "Could not create account. Please try again." };
   }
 
-  if (data.session === null) {
-    return { success: "Check your email to confirm your account." };
+  // When email confirmation is enabled, Supabase intentionally returns no session.
+  // Provisioning happens after the confirmation link returns through /auth/callback.
+  if (!data.session?.access_token) {
+    return { success: "Check your email to confirm your account. We'll take you through workspace setup after verification." };
   }
 
-  redirect("/dashboard");
+  const result = await destinationOrError(data.session.access_token);
+  if (result.error || !result.destination) return { error: result.error ?? "Unable to load your workspace." };
+  redirect(result.destination);
 }
 
 export async function forgotPasswordAction(prevState: AuthState, formData: FormData): Promise<AuthState> {
-  // 1. Rate Limiting
-  const ip = (await headers()).get("x-forwarded-for") ?? "127.0.0.1";
-  const { success } = await ratelimit.limit(`forgot_${ip}`);
-  if (!success) {
-    return { error: "Too many requests. Please try again in a minute." };
-  }
+  const limited = await rateLimit("forgot", "Too many requests. Please try again in a minute.");
+  if (limited) return limited;
 
-  const email = formData.get("email") as string;
-
+  const email = String(formData.get("email") ?? "").trim();
   if (!email || !email.includes("@")) {
     return { fieldErrors: { email: ["Please enter a valid email address."] } };
   }
 
   const supabase = await createClient();
-  const origin = (await headers()).get("origin");
-
+  const requestHeaders = await headers();
+  const origin = requestHeaders.get("origin") || process.env.NEXT_PUBLIC_SITE_URL;
   await supabase.auth.resetPasswordForEmail(email, {
-    redirectTo: `${origin}/auth/callback?next=/reset-password`,
+    ...(origin ? { redirectTo: `${origin.replace(/\/$/, "")}/auth/callback?next=/reset-password` } : {}),
   });
 
-  return { success: "If an account exists with this email, a reset link has been sent." };
+  return { success: "If an account exists with this email, a password reset link has been sent." };
 }
 
 export async function resetPasswordAction(prevState: AuthState, formData: FormData): Promise<AuthState> {
-  const password = formData.get("password") as string;
-
-  const validated = resetPasswordSchema.safeParse({ password });
+  const validated = resetPasswordSchema.safeParse({ password: formData.get("password") });
   if (!validated.success) {
     return { fieldErrors: validated.error.flatten().fieldErrors };
   }
 
   const supabase = await createClient();
-  const { error } = await supabase.auth.updateUser({ 
-    password: validated.data.password 
-  });
-
+  const { error } = await supabase.auth.updateUser({ password: validated.data.password });
   if (error) {
     return { error: "Failed to update password. Your session may have expired." };
   }
-  
-  redirect("/dashboard");
+
+  const { data: { session } } = await supabase.auth.getSession();
+  if (!session?.access_token) redirect("/sign-in");
+
+  const result = await destinationOrError(session.access_token);
+  if (result.error || !result.destination) return { error: result.error ?? "Unable to load your workspace." };
+  redirect(result.destination);
 }
