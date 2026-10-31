@@ -1,8 +1,6 @@
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 
-export const dynamic = "force-dynamic";
-
 function backendBaseUrl() {
   const value = process.env.BACKEND_API_URL?.trim();
   if (!value) throw new Error("BACKEND_API_URL is not configured");
