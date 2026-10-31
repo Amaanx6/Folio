@@ -266,43 +266,30 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
 
       {/* Authentication form */}
       <section className="relative flex h-dvh min-h-0 flex-col overflow-hidden bg-[#FCFBF7] px-6 py-5 sm:px-10 sm:py-6 lg:px-[clamp(3rem,7vw,7rem)] lg:py-8">
-        <header className="flex min-h-10 items-center justify-between gap-3">
+        <header className="relative z-20 flex h-14 shrink-0 items-center">
           <Link
             href="/"
             aria-label="Foolioo home"
-            className="group inline-flex shrink-0 items-center gap-2 rounded-sm transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FDAD86] focus-visible:ring-offset-4"
+            className="group inline-flex items-center gap-2.5 rounded-sm transition-opacity hover:opacity-85 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FDAD86] focus-visible:ring-offset-4"
           >
             <Image
               src="/Foolioo.svg"
               alt=""
               aria-hidden="true"
-              width={25}
-              height={30}
+              width={30}
+              height={34}
               priority
-              className="h-[30px] w-[26px] object-contain transition-transform duration-300 group-hover:-rotate-3 group-hover:scale-[1.04]"
+              className="h-[34px] w-[30px] object-contain transition-transform duration-300 group-hover:-rotate-3 group-hover:scale-[1.04]"
             />
-            <span className="relative -mt-0.5 inline-flex items-baseline font-['Newsreader'] text-[29px] font-medium italic leading-none tracking-[-1.45px] text-[#24231F] transition-colors duration-200 group-hover:text-[#FD7032]">
+            <span className="inline-flex items-baseline font-['Newsreader'] text-[32px] font-medium italic leading-none tracking-[-1.6px] text-[#24231F]">
               foolioo<span className="ml-[1px] not-italic text-[#FD7032]">.</span>
             </span>
           </Link>
-
-          <span className="inline-flex shrink-0 items-center gap-2 rounded-full border border-[#EAE6DC] bg-white/75 px-3 py-2 font-['Space_Grotesk'] text-[9px] font-semibold tracking-[0.09em] text-[#77736B] shadow-[0_2px_8px_rgba(34,30,20,0.035)] sm:text-[10px]">
-            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#FFF0E8] text-[#FD7032]">
-              <LockIcon />
-            </span>
-            <span className="hidden sm:inline">SECURE WORKSPACE</span>
-            <span className="sm:hidden">SECURE</span>
-          </span>
         </header>
 
-        <div className="flex min-h-0 flex-1 items-center justify-center py-4 lg:py-8">
-          <div className="w-full max-w-[400px]">
-            <div className="mb-7">
-              <p className="mb-3 font-['Space_Grotesk'] text-[10px] font-semibold uppercase tracking-[0.16em] text-[#7852D6]">
-                {isSignUp ? "START YOUR FOOLIOO WORKSPACE" : "WORKSPACE ACCESS"}
-              </p>
-              {children}
-            </div>
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-y-contain [scrollbar-width:none] [&::-webkit-scrollbar]:hidden lg:flex lg:items-center lg:justify-center lg:overflow-visible">
+          <div className="w-full max-w-[400px] py-6 lg:py-8">
+            {children}
           </div>
         </div>
 
