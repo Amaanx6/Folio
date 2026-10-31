@@ -24,8 +24,7 @@ const Navbar = () => {
     "whitespace-nowrap font-['Space_Grotesk'] text-[13px] font-medium leading-[18px] tracking-[0.1px] text-[#55534F] transition-colors duration-200 hover:text-[#FD7032] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FDAD86] focus-visible:ring-offset-4";
 
   const primaryButton =
-    "inline-flex h-10 shrink-0 items-center justify-center rounded-full bg-[#FD7032] px-5 font-['Space_Grotesk'] text-[12px] font-semibold tracking-[0.1px] text-white shadow-[0_3px_10px_rgba(253,112,50,0.16)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#E9632B] hover:shadow-[0_5px_16px_rgba(253,112,50,0.24)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FDAD86] focus-visible:ring-offset-2";
-
+  "inline-flex h-10 shrink-0 items-center justify-center rounded-full bg-[#1B1C18] px-5 font-['Space_Grotesk'] text-[12px] font-semibold tracking-[0.1px] text-white shadow-[0_3px_10px_rgba(27,28,24,0.10)] transition-all duration-200 hover:-translate-y-0.5 hover:bg-[#34352F] hover:shadow-[0_5px_16px_rgba(27,28,24,0.16)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FDAD86] focus-visible:ring-offset-2";
   const handleNavClick = () => {
     setMenuOpen(false);
   };
