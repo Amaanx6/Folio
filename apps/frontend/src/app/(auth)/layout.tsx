@@ -1,6 +1,7 @@
 
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import type { ReactNode } from "react";
@@ -265,17 +266,32 @@ export default function AuthLayout({ children }: { children: ReactNode }) {
 
       {/* Authentication form */}
       <section className="relative flex h-dvh min-h-0 flex-col overflow-hidden bg-[#FCFBF7] px-6 py-5 sm:px-10 sm:py-6 lg:px-[clamp(3rem,7vw,7rem)] lg:py-8">
-        <header className="flex items-center justify-between">
+        <header className="flex min-h-10 items-center justify-between gap-3">
           <Link
             href="/"
             aria-label="Foolioo home"
-            className="font-['Space_Grotesk'] text-[17px] font-semibold lowercase tracking-[-0.7px] text-[#1B1C18] transition-opacity hover:opacity-70"
+            className="group inline-flex shrink-0 items-center gap-2 rounded-sm transition-opacity hover:opacity-80 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#FDAD86] focus-visible:ring-offset-4"
           >
-            foolioo<span className="text-[#7852D6]">.</span>
+            <Image
+              src="/Foolioo.svg"
+              alt=""
+              aria-hidden="true"
+              width={25}
+              height={30}
+              priority
+              className="h-[30px] w-[26px] object-contain transition-transform duration-300 group-hover:-rotate-3 group-hover:scale-[1.04]"
+            />
+            <span className="relative -mt-0.5 inline-flex items-baseline font-['Newsreader'] text-[29px] font-medium italic leading-none tracking-[-1.45px] text-[#24231F] transition-colors duration-200 group-hover:text-[#FD7032]">
+              foolioo<span className="ml-[1px] not-italic text-[#FD7032]">.</span>
+            </span>
           </Link>
 
-          <span className="hidden items-center gap-1.5 font-['Space_Grotesk'] text-[10px] font-medium tracking-[0.08em] text-[#92938C] sm:inline-flex lg:hidden xl:inline-flex">
-            <LockIcon /> SECURE WORKSPACE ACCESS
+          <span className="inline-flex shrink-0 items-center gap-2 rounded-full border border-[#EAE6DC] bg-white/75 px-3 py-2 font-['Space_Grotesk'] text-[9px] font-semibold tracking-[0.09em] text-[#77736B] shadow-[0_2px_8px_rgba(34,30,20,0.035)] sm:text-[10px]">
+            <span className="flex h-5 w-5 items-center justify-center rounded-full bg-[#FFF0E8] text-[#FD7032]">
+              <LockIcon />
+            </span>
+            <span className="hidden sm:inline">SECURE WORKSPACE</span>
+            <span className="sm:hidden">SECURE</span>
           </span>
         </header>
 
